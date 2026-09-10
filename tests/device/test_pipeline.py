@@ -19,6 +19,14 @@ class _FakeTTS:
         return TTSResult(pcm_audio=b"\x00\x01" * 480, sample_rate=24000, latency_ms=200)
 
 
+class _FakeTTSNonOpusRate:
+    """Simula Piper voice id_ID sungguhan, yang keluar di 22050Hz - bukan salah
+    satu dari 5 sample rate valid Opus (8k/12k/16k/24k/48k)."""
+
+    async def synthesize(self, text: str, *, voice: str) -> TTSResult:
+        return TTSResult(pcm_audio=b"\x00\x01" * 2205, sample_rate=22050, latency_ms=200)
+
+
 async def test_handle_utterance_emits_events_in_order():
     pipeline = Pipeline(
         stt=_FakeSTT(),
@@ -106,4 +114,24 @@ async def test_handle_utterance_without_search_adapter_ignores_tool_calls():
         search=None,
     )
     events = [event async for event in pipeline.handle_utterance(pcm_audio=b"\x00" * 1000)]
+    assert events[-1]["kind"] == "tts_stop"
+
+
+async def test_handle_utterance_resamples_non_opus_rate_before_encoding():
+    # Regresi: ditemukan lewat tes manual end-to-end sungguhan - opuslib.Encoder
+    # melempar "invalid argument" untuk sample rate yang bukan salah satu dari
+    # 8000/12000/16000/24000/48000. Voice Piper id_ID kita (22050Hz) selalu kena
+    # ini tanpa resample dulu.
+    pipeline = Pipeline(
+        stt=_FakeSTT(),
+        llm=_FakeLLM(),
+        tts=_FakeTTSNonOpusRate(),
+        voice="id_ID-news_tts-medium",
+        system_prompt="Kamu Zora.",
+    )
+
+    events = [event async for event in pipeline.handle_utterance(pcm_audio=b"\x00" * 1000)]
+
+    audio_frames = [e for e in events if e["kind"] == "audio_frame"]
+    assert len(audio_frames) > 0
     assert events[-1]["kind"] == "tts_stop"

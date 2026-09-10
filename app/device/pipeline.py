@@ -1,3 +1,4 @@
+import audioop
 import json
 from typing import TYPE_CHECKING, AsyncIterator, TypedDict
 
@@ -11,6 +12,14 @@ if TYPE_CHECKING:
     from app.device.mcp_client import McpClient
 
 _SEARCH_TOOL_NAME = "web_search"
+
+# Opus cuma menerima 5 sample rate ini (8k/12k/16k/24k/48k) - encoder melempar
+# "invalid argument" untuk rate lain. TTS adapter boleh punya sample rate model
+# apa saja (mis. voice Piper id_ID kita 22050Hz), jadi resample dulu ke rate
+# downlink yang dinegosiasikan ke device (lihat _DOWNLINK_AUDIO_PARAMS di ws.py)
+# sebelum encode - ditemukan lewat tes manual voice loop end-to-end sungguhan.
+_OPUS_VALID_RATES = {8000, 12000, 16000, 24000, 48000}
+_DOWNLINK_RATE = 24000
 
 _SEARCH_TOOL_SCHEMA = [
     {
@@ -113,13 +122,18 @@ class Pipeline:
         yield OutgoingEvent(kind="tts_start")
         yield OutgoingEvent(kind="tts_sentence", text=llm_result.text)
 
-        frame_bytes = 2 * (tts_result.sample_rate * 60 // 1000)  # 16-bit mono, 60ms
         pcm = tts_result.pcm_audio
+        sample_rate = tts_result.sample_rate
+        if sample_rate not in _OPUS_VALID_RATES:
+            pcm, _ = audioop.ratecv(pcm, 2, 1, sample_rate, _DOWNLINK_RATE, None)
+            sample_rate = _DOWNLINK_RATE
+
+        frame_bytes = 2 * (sample_rate * 60 // 1000)  # 16-bit mono, 60ms
         for offset in range(0, len(pcm), frame_bytes):
             chunk = pcm[offset : offset + frame_bytes]
             if len(chunk) < frame_bytes:
                 chunk = chunk + b"\x00" * (frame_bytes - len(chunk))
-            opus_packet = opus_encode(chunk, sample_rate=tts_result.sample_rate, frame_duration_ms=60)
+            opus_packet = opus_encode(chunk, sample_rate=sample_rate, frame_duration_ms=60)
             yield OutgoingEvent(kind="audio_frame", data=opus_packet)
 
         yield OutgoingEvent(kind="tts_stop")
