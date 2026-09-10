@@ -1,4 +1,11 @@
 # syntax=docker/dockerfile:1
+
+# Stage 1: build frontend dashboard (React + Vite + Tailwind) jadi static assets.
+FROM node:20-slim AS frontend-build
+WORKDIR /app
+COPY frontend/ frontend/
+RUN cd frontend && npm ci && npm run build
+
 FROM python:3.11-slim
 
 # libopus0: runtime library dibutuhkan opuslib (STT/TTS audio codec).
@@ -19,6 +26,7 @@ RUN uv sync --frozen --no-install-project --no-dev
 COPY app/ app/
 COPY alembic/ alembic/
 COPY alembic.ini ./
+COPY --from=frontend-build /app/frontend/dist frontend/dist
 
 RUN uv sync --frozen --no-dev
 
