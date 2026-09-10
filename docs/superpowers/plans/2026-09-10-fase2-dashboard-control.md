@@ -389,8 +389,14 @@ async def test_owner_id_accessible():
 - [ ] **Step 10:** Tulis `app/core/tenant.py`.
 - [ ] **Step 11:** Jalankan test — expected: PASS.
 - [ ] **Step 12:** Tambah `jwt_secret` ke `app/config.py` Settings (dari env, default random untuk dev).
-- [ ] **Step 13:** Jalankan `pytest -v tests/core/` — expected: PASS semua.
-- [ ] **Step 14:** Commit.
+- [ ] **Step 13:** Tambah `get_session()` ke `app/core/db.py` — generator dependency FastAPI yang dipakai `control/auth.py` (Task 14) dan seluruh endpoint REST (Task 15):
+  ```python
+  async def get_session():
+      async with get_sessionmaker()() as session:
+          yield session
+  ```
+- [ ] **Step 14:** Jalankan `pytest -v tests/core/` — expected: PASS semua.
+- [ ] **Step 15:** Commit.
 
 ```bash
 git add app/core/bus.py app/core/tenant.py app/core/security.py app/config.py tests/core/test_bus.py tests/core/test_security.py tests/core/test_tenant.py pyproject.toml
@@ -710,82 +716,135 @@ git commit -m "feat: MCP JSON-RPC client with allowlist and timeout"
 
 Sambungkan McpClient ke pipeline voice loop. Saat LLM membalas dengan `tool_calls`, pipeline memanggil tool device via McpClient, lalu kirim hasilnya kembali ke LLM untuk response akhir.
 
+**Interface asli dari Fase 1 (jangan diimprovisasi ulang):** `Pipeline.handle_utterance(self, pcm_audio: bytes) -> AsyncIterator[OutgoingEvent]` (generator yang menghasilkan event `stt`/`tts_start`/`tts_sentence`/`audio_frame`/`tts_stop` — bukan method `process()` yang mengembalikan objek tunggal), dan `LLMAdapter.complete(self, messages, *, tools=None, max_tokens=160, temperature=0.7) -> LLMResponse` (bukan `.chat()`). Task 9 Fase 1 sudah menambahkan parameter `search: SearchAdapter | None` dan logika tool-call untuk web search dengan pola: kalau `llm_result.tool_calls` ada, jalankan tool, suntik hasilnya sebagai pesan `role: "tool"`, panggil `self._llm.complete(messages=messages)` lagi. Task 13 ini mengikuti pola YANG SAMA, cuma menambah `mcp` sebagai sumber tool kedua di samping `search`.
+
 **Files:**
-- Modify: `app/device/pipeline.py` — tambah MCP tool-call handling
-- Modify: `app/device/ws.py` — instantiate McpClient per session, route response ke `handle_response`
+- Modify: `app/device/pipeline.py` — tambah parameter `mcp` dan tool schema MCP ke `Pipeline.__init__`, perluas logika tool-call Task 9 supaya bisa mendispatch ke `search` ATAU `mcp` tergantung nama tool yang diminta LLM
+- Modify: `app/device/ws.py` — instantiate McpClient per session, route pesan JSON-RPC respons ke `handle_response`
 - Test: `tests/device/test_pipeline_mcp.py`
 
 ### Test: `tests/device/test_pipeline_mcp.py`
 
 ```python
+import json
+
 import pytest
-from unittest.mock import AsyncMock, MagicMock, patch
+
+from app.adapters.llm.base import LLMResponse
+from app.adapters.stt.base import STTResult
+from app.adapters.tts.base import TTSResult
 from app.device.pipeline import Pipeline
-from app.device.mcp_client import McpClient
 
-@pytest.mark.asyncio
-async def test_pipeline_handles_tool_call():
-    """LLM minta tool_call, pipeline panggil MCP, kirim hasil ke LLM, dapat jawaban akhir."""
-    mock_llm = AsyncMock()
-    mock_llm.chat = AsyncMock(side_effect=[
-        MagicMock(text="", tool_calls=[{"id": "call_1", "function": {"name": "take_photo", "arguments": "{}"}}]),
-        MagicMock(text="Ini foto dari kamera device.", tool_calls=None),
-    ])
 
-    mock_mcp = AsyncMock()
-    mock_mcp.call_tool = AsyncMock(return_value={"isError": False, "content": [{"type": "text", "text": "photo data"}]})
+class _FakeSTT:
+    async def transcribe(self, pcm_audio, *, sample_rate=16000):
+        return STTResult(text="ambil foto dong", latency_ms=100)
 
-    pipeline = Pipeline(llm=mock_llm, mcp=mock_mcp)
 
-    # Jalankan pipeline dengan teks STT
-    result = await pipeline.process("ambil foto", session=MagicMock())
+class _FakeTTS:
+    async def synthesize(self, text, *, voice):
+        return TTSResult(pcm_audio=b"\x00\x01" * 480, sample_rate=24000, latency_ms=50)
 
-    assert "foto" in result.text.lower()
-    assert mock_mcp.call_tool.call_count == 1
-    assert mock_llm.chat.call_count == 2  # panggilan awal + panggilan lanjutan dengan hasil tool
 
-@pytest.mark.asyncio
-async def test_pipeline_tool_call_error_continues():
-    """Kalau MCP error, pipeline tetap ngasih response ke user."""
-    mock_llm = AsyncMock()
-    mock_llm.chat = AsyncMock(side_effect=[
-        MagicMock(text="", tool_calls=[{"id": "call_1", "function": {"name": "take_photo", "arguments": "{}"}}]),
-        MagicMock(text="Maaf, kamera sedang bermasalah.", tool_calls=None),
-    ])
+class _FakeLLMWithMcpToolCall:
+    def __init__(self):
+        self._call_count = 0
 
-    mock_mcp = AsyncMock()
-    mock_mcp.call_tool = AsyncMock(return_value={"isError": True, "content": [{"type": "text", "text": "timeout"}]})
+    async def complete(self, messages, *, tools=None, max_tokens=160, temperature=0.7):
+        self._call_count += 1
+        if self._call_count == 1:
+            return LLMResponse(
+                text="",
+                tool_calls=[
+                    {"id": "call_1", "function": {"name": "take_photo", "arguments": "{}"}}
+                ],
+                latency_ms=500,
+            )
+        return LLMResponse(text="Ini foto dari kamera device.", tool_calls=[], latency_ms=600)
 
-    pipeline = Pipeline(llm=mock_llm, mcp=mock_mcp)
-    result = await pipeline.process("ambil foto", session=MagicMock())
 
-    assert "masalah" in result.text.lower()
+class _FakeMcpClient:
+    def __init__(self, result: dict):
+        self._result = result
+        self.call_count = 0
 
-@pytest.mark.asyncio
-async def test_pipeline_no_tool_call_normal_flow():
-    """LLM tidak minta tool — flow normal, MCP tidak dipanggil."""
-    mock_llm = AsyncMock()
-    mock_llm.chat = AsyncMock(return_value=MagicMock(text="Halo, apa kabar?", tool_calls=None))
+    async def call_tool(self, name: str, arguments: dict | None = None) -> dict:
+        self.call_count += 1
+        return self._result
 
-    mock_mcp = AsyncMock()
+    async def get_allowed_tools(self) -> list[dict]:
+        return [{"name": "take_photo", "description": "ambil foto", "inputSchema": {"type": "object", "properties": {}}}]
 
-    pipeline = Pipeline(llm=mock_llm, mcp=mock_mcp)
-    result = await pipeline.process("hai", session=MagicMock())
 
-    assert result.text == "Halo, apa kabar?"
-    assert mock_mcp.call_tool.call_count == 0
+async def test_handle_utterance_dispatches_mcp_tool_call():
+    fake_mcp = _FakeMcpClient({"isError": False, "content": [{"type": "text", "text": "photo data"}]})
+    pipeline = Pipeline(
+        stt=_FakeSTT(),
+        llm=_FakeLLMWithMcpToolCall(),
+        tts=_FakeTTS(),
+        voice="id_ID-news-medium",
+        system_prompt="Kamu Zora.",
+        mcp=fake_mcp,
+    )
+
+    events = [event async for event in pipeline.handle_utterance(pcm_audio=b"\x00" * 1000)]
+
+    sentence_events = [e for e in events if e["kind"] == "tts_sentence"]
+    assert any("foto" in e["text"].lower() for e in sentence_events)
+    assert fake_mcp.call_count == 1
+    assert events[-1]["kind"] == "tts_stop"
+
+
+async def test_handle_utterance_mcp_error_still_completes():
+    fake_mcp = _FakeMcpClient({"isError": True, "content": [{"type": "text", "text": "timeout"}]})
+    pipeline = Pipeline(
+        stt=_FakeSTT(),
+        llm=_FakeLLMWithMcpToolCall(),
+        tts=_FakeTTS(),
+        voice="id_ID-news-medium",
+        system_prompt="Kamu Zora.",
+        mcp=fake_mcp,
+    )
+
+    events = [event async for event in pipeline.handle_utterance(pcm_audio=b"\x00" * 1000)]
+
+    # LLM tetap dipanggil ronde kedua dengan konteks error tool, dan pipeline tetap selesai
+    assert events[-1]["kind"] == "tts_stop"
+    assert fake_mcp.call_count == 1
+
+
+class _FakeLLMNoToolCall:
+    async def complete(self, messages, *, tools=None, max_tokens=160, temperature=0.7):
+        return LLMResponse(text="Halo, apa kabar?", tool_calls=[], latency_ms=400)
+
+
+async def test_handle_utterance_without_tool_call_never_touches_mcp():
+    fake_mcp = _FakeMcpClient({"isError": False, "content": []})
+    pipeline = Pipeline(
+        stt=_FakeSTT(),
+        llm=_FakeLLMNoToolCall(),
+        tts=_FakeTTS(),
+        voice="id_ID-news-medium",
+        system_prompt="Kamu Zora.",
+        mcp=fake_mcp,
+    )
+
+    events = [event async for event in pipeline.handle_utterance(pcm_audio=b"\x00" * 1000)]
+
+    assert fake_mcp.call_count == 0
+    sentence_events = [e for e in events if e["kind"] == "tts_sentence"]
+    assert any(e["text"] == "Halo, apa kabar?" for e in sentence_events)
 ```
 
 ### Steps
 
-- [ ] **Step 1:** Tulis `tests/device/test_pipeline_mcp.py` — 3 test: tool-call handled, tool-call error continues, no tool-call normal flow.
-- [ ] **Step 2:** Jalankan test — expected: FAIL.
-- [ ] **Step 3:** Modify `app/device/pipeline.py` — tambah parameter `mcp: McpClient | None = None` di `__init__`. Di `process()`, setelah LLM response, kalau ada `tool_calls`, panggil `self._mcp.call_tool()` untuk tiap call, kumpulkan hasil, lalu panggil `self._llm.chat()` lagi dengan hasil tool sebagai context.
-- [ ] **Step 4:** Modify `app/device/ws.py` — di handler WebSocket, instantiate `McpClient(ws_send_fn)` per session. Route pesan JSON-RPC response dari device ke `mcp.handle_response(msg)`. Kirim `initialize` sekali di awal koneksi.
-- [ ] **Step 5:** Tambah `McpClient` ke schema tools yang diekspos ke LLM — panggil `mcp.get_allowed_tools()` di awal session, inject sebagai `tools` parameter di `llm.chat()`.
-- [ ] **Step 6:** Jalankan test — expected: PASS.
-- [ ] **Step 7:** Jalankan `pytest -v tests/device/` — expected: PASS semua (Fase 1 + Fase 2).
-- [ ] **Step 8:** Commit.
+- [ ] **Step 1:** Tulis `tests/device/test_pipeline_mcp.py` sesuai kode di atas — 3 test: MCP tool-call dispatched, MCP error tetap selesai, tidak ada tool-call tidak menyentuh MCP.
+- [ ] **Step 2:** Jalankan test — expected: FAIL (`Pipeline.__init__` belum menerima parameter `mcp`).
+- [ ] **Step 3:** Modify `app/device/pipeline.py`: tambah parameter `mcp: "McpClient | None" = None` ke `Pipeline.__init__` (import `McpClient` cukup untuk type hint — gunakan `from __future__ import annotations` atau string literal untuk menghindari circular import kalau `mcp_client.py` nanti perlu impor sesuatu dari `pipeline.py`). Di dalam `handle_utterance`, PERLUAS blok tool-call yang sudah ada dari Task 9 (bukan ditulis ulang dari nol) — sekarang tool schema gabungan dari `_SEARCH_TOOL_SCHEMA` (kalau `self._search` ada) DAN hasil `await self._mcp.get_allowed_tools()` diterjemahkan ke bentuk OpenAI function-calling (kalau `self._mcp` ada), dan saat memproses `llm_result.tool_calls[0]`, cek nama tool: kalau `call["function"]["name"] == "web_search"` dispatch ke `self._search.search(...)` (kode Task 9 yang sudah ada), SELAIN itu (nama lain) dispatch ke `await self._mcp.call_tool(name, arguments)` — hasil `content[0]["text"]` (atau pesan error kalau `isError: True`) disuntik sebagai pesan `role: "tool"` sama seperti pola search, lalu panggil `self._llm.complete(messages=messages)` lagi untuk jawaban akhir.
+- [ ] **Step 4:** Modify `app/device/ws.py` — di dalam `_build_pipeline()` (atau titik setup session di handler WebSocket), instantiate `McpClient(ws_send_fn=websocket.send_text)` per koneksi, kirim `initialize` sekali sebelum turn pertama, dan pastikan pesan masuk bertipe `{"type": "mcp", ...}` di loop pesan WebSocket (blok `if "text" in message` Task 8) di-route ke `await mcp_client.handle_response(message["text"])` alih-alih diabaikan.
+- [ ] **Step 5:** Jalankan test — expected: PASS.
+- [ ] **Step 6:** Jalankan `pytest -v tests/device/` — expected: PASS semua (Fase 1 + Fase 2), termasuk test Task 9 yang lama (`test_handle_utterance_with_tool_call_invokes_search` dkk) — pastikan perluasan Step 3 tidak meregresi jalur search yang sudah ada.
+- [ ] **Step 7:** Commit.
 
 ```bash
 git add app/device/pipeline.py app/device/ws.py tests/device/test_pipeline_mcp.py
@@ -805,10 +864,13 @@ Auth dasar: login endpoint yang mengembalikan JWT, dependency FastAPI yang verif
 
 ### `app/control/auth.py`
 
+Model `User` dan `Owner` dipisah sejak Fase 1 Task 1 (`User.email`/`password_hash` = identitas login, `Owner.user_id` FK = tenant) — router ini query lewat ORM `select()`, bukan raw SQL, supaya konsisten dengan gaya Task 1 dan tidak butuh impor `text()` terpisah.
+
 ```python
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from pydantic import BaseModel
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.db import get_session
@@ -829,19 +891,13 @@ class LoginResponse(BaseModel):
 
 @router.post("/login", response_model=LoginResponse)
 async def login(req: LoginRequest, db: AsyncSession = Depends(get_session)):
-    result = await db.execute(
-        text("SELECT * FROM users WHERE email = :email"),
-        {"email": req.email}
-    )
-    user = result.fetchone()
+    result = await db.execute(select(User).where(User.email == req.email))
+    user = result.scalar_one_or_none()
     if user is None or not verify_password(req.password, user.password_hash):
         raise HTTPException(status_code=401, detail="Email atau password salah")
 
-    owner_result = await db.execute(
-        text("SELECT id FROM owners WHERE user_id = :uid"),
-        {"uid": user.id}
-    )
-    owner = owner_result.fetchone()
+    owner_result = await db.execute(select(Owner).where(Owner.user_id == user.id))
+    owner = owner_result.scalar_one_or_none()
     if owner is None:
         raise HTTPException(status_code=403, detail="User belum punya owner record")
 
@@ -857,15 +913,20 @@ async def get_current_owner(
     if user_id is None:
         raise HTTPException(status_code=401, detail="Token tidak valid")
 
-    result = await db.execute(
-        text("SELECT id FROM owners WHERE user_id = :uid"),
-        {"uid": user_id}
-    )
-    owner = result.fetchone()
+    result = await db.execute(select(Owner).where(Owner.user_id == user_id))
+    owner = result.scalar_one_or_none()
     if owner is None:
         raise HTTPException(status_code=403, detail="Owner tidak ditemukan")
 
     return str(owner.id)
+```
+
+Catatan: `app.core.db` Fase 1 hanya menyediakan `get_engine()`/`get_sessionmaker()`, belum ada `get_session()` sebagai FastAPI dependency generator. Tambahkan ke `app/core/db.py` sebagai bagian dari Task 11 (sebelum Task 14 dipakai):
+
+```python
+async def get_session():
+    async with get_sessionmaker()() as session:
+        yield session
 ```
 
 ### Test: `tests/control/test_auth.py`

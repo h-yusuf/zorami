@@ -104,7 +104,9 @@ Sebelum executor mulai Task 1, environment berikut harus ada:
 - Create: `tests/core/test_models.py`
 
 **Interfaces:**
-- Produces: `app.core.db.get_engine() -> AsyncEngine`, `app.core.db.get_sessionmaker() -> async_sessionmaker`, `app.config.Settings` (pydantic-settings `BaseSettings` dengan field `database_url: str`, `secret_key: bytes`), model SQLAlchemy `Owner`, `Device`, `ActivationCode`, `Conversation`, `Message` di `app.core.models` (semuanya `DeclarativeBase` subclass bernama `Base`).
+- Produces: `app.core.db.get_engine() -> AsyncEngine`, `app.core.db.get_sessionmaker() -> async_sessionmaker`, `app.config.Settings` (pydantic-settings `BaseSettings` dengan field `database_url: str`, `secret_key: bytes`), model SQLAlchemy `User`, `Owner`, `Device`, `ActivationCode`, `Conversation`, `Message` di `app.core.models` (semuanya `DeclarativeBase` subclass bernama `Base`).
+
+**Kenapa `User` dan `Owner` dua tabel terpisah, bukan satu:** spec §6 sengaja memisahkan identitas login (`users` — email, password_hash) dari tenant (`owners` — `user_id` FK). Fase 3 (RBAC) butuh satu `user` bisa punya `membership` ke banyak `owner` dengan peran berbeda-beda (Operator di tenant A, Viewer di tenant B) — itu tidak mungkin kalau identitas login dan tenant digabung jadi satu row. Jangan gabungkan keduanya demi "lebih simpel di Fase 1" — itu breaking change untuk Fase 3.
 
 - [ ] **Step 1: Tulis `pyproject.toml`**
 
@@ -195,7 +197,7 @@ from datetime import datetime, timezone
 import pytest
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
 
-from app.core.models import Base, Owner, Device, ActivationCode
+from app.core.models import Base, User, Owner, Device, ActivationCode
 
 
 @pytest.fixture
@@ -209,8 +211,12 @@ async def session():
     await engine.dispose()
 
 
-async def test_owner_device_round_trip(session):
-    owner = Owner(id=uuid.uuid4(), email="yusuf@tspindonesia.com")
+async def test_user_owner_device_round_trip(session):
+    user = User(id=uuid.uuid4(), email="yusuf@tspindonesia.com", password_hash="argon2-hash")
+    session.add(user)
+    await session.flush()
+
+    owner = Owner(id=uuid.uuid4(), user_id=user.id)
     session.add(owner)
     await session.flush()
 
@@ -230,9 +236,16 @@ async def test_owner_device_round_trip(session):
     assert fetched.device_id == "A4:CF:12:9B:00:7E"
     assert fetched.agent_id is None
 
+    fetched_owner = await session.get(Owner, owner.id)
+    assert fetched_owner.user_id == user.id
+
 
 async def test_activation_code_expiry_field(session):
-    owner = Owner(id=uuid.uuid4(), email="a@b.com")
+    user = User(id=uuid.uuid4(), email="a@b.com", password_hash="argon2-hash")
+    session.add(user)
+    await session.flush()
+
+    owner = Owner(id=uuid.uuid4(), user_id=user.id)
     session.add(owner)
     await session.flush()
 
@@ -296,12 +309,31 @@ class Base(DeclarativeBase):
     pass
 
 
-class Owner(Base):
-    __tablename__ = "owners"
+class User(Base):
+    """Identitas login — bukan tenant. Satu User bisa punya Owner (tenant) sendiri
+    dan/atau Membership ke tenant orang lain lewat Fase 3 (RBAC). Jangan gabung
+    ini dengan Owner walau di Fase 1 rasanya berlebihan — Fase 3 butuh satu User
+    memetakan ke banyak tenant dengan peran berbeda-beda per tenant."""
+
+    __tablename__ = "users"
 
     id: Mapped[uuid.UUID] = mapped_column(GUID(), primary_key=True, default=uuid.uuid4)
     email: Mapped[str] = mapped_column(String(320), unique=True)
-    password_hash: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    password_hash: Mapped[str] = mapped_column(String(255))
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
+    )
+
+
+class Owner(Base):
+    """Tenant — unit isolasi data (agents, devices, conversations semua di-scope ke owner_id
+    ini, bukan ke user_id). `user_id` menunjuk User yang membuat tenant ini (Owner asli /
+    pemegang peran 'owner' pertama); anggota lain bergabung lewat Membership di Fase 3."""
+
+    __tablename__ = "owners"
+
+    id: Mapped[uuid.UUID] = mapped_column(GUID(), primary_key=True, default=uuid.uuid4)
+    user_id: Mapped[uuid.UUID] = mapped_column(GUID(), ForeignKey("users.id"), unique=True)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
     )
@@ -598,12 +630,16 @@ async def test_activate_returns_200_after_claim(client):
 
     session_maker = get_sessionmaker()
     async with session_maker() as session:
-        from app.core.models import Owner, ActivationCode
+        from app.core.models import User, Owner, ActivationCode
         from sqlalchemy import select
         import uuid
         from datetime import datetime, timezone
 
-        owner = Owner(id=uuid.uuid4(), email="test-owner@example.com")
+        user = User(id=uuid.uuid4(), email="test-owner@example.com", password_hash="argon2-hash")
+        session.add(user)
+        await session.flush()
+
+        owner = Owner(id=uuid.uuid4(), user_id=user.id)
         session.add(owner)
         await session.flush()
 
@@ -783,7 +819,7 @@ async def activate(
         return JSONResponse(status_code=200, content={"access_token": "granted"})
 ```
 
-**Catatan penting untuk implementer** (bukan placeholder — ini keputusan yang sengaja ditunda dengan alasan eksplisit): field `token_hash` di model `Device` (Task 1) dinamai demikian karena spec §8 mensyaratkan token disimpan sebagai hash, bukan plaintext. Kode Step 4 di atas untuk sementara MENYIMPAN TOKEN MENTAH ke kolom itu supaya Task 3 bisa selesai dan diuji tanpa bergantung pada skema hashing token device (belum dispesifikasikan — beda dari password hashing `Owner.password_hash` yang pakai argon2 di Fase 2/3). **Sebelum Fase 1 dianggap selesai, buka isu susulan:** ganti jadi hash (mis. SHA-256 token, karena token device bukan password yang butuh argon2 — device membandingkan token apa adanya, bukan lewat form login) dan bandingkan hash saat validasi WS handshake di Task 7. Jangan biarkan token plaintext ini lolos ke produksi.
+**Catatan penting untuk implementer** (bukan placeholder — ini keputusan yang sengaja ditunda dengan alasan eksplisit): field `token_hash` di model `Device` (Task 1) dinamai demikian karena spec §8 mensyaratkan token disimpan sebagai hash, bukan plaintext. Kode Step 4 di atas untuk sementara MENYIMPAN TOKEN MENTAH ke kolom itu supaya Task 3 bisa selesai dan diuji tanpa bergantung pada skema hashing token device (belum dispesifikasikan — beda dari password hashing `User.password_hash` yang pakai argon2 di Fase 2/3). **Sebelum Fase 1 dianggap selesai, buka isu susulan:** ganti jadi hash (mis. SHA-256 token, karena token device bukan password yang butuh argon2 — device membandingkan token apa adanya, bukan lewat form login) dan bandingkan hash saat validasi WS handshake di Task 7. Jangan biarkan token plaintext ini lolos ke produksi.
 
 - [ ] **Step 5: Jalankan test, pastikan lulus**
 
@@ -2592,7 +2628,7 @@ async def _log_turn(*, device_id: str, session_id: str, user_text: str, assistan
 - [ ] **Step 4: Jalankan test, pastikan lulus**
 
 Run: `pytest tests/device/test_conversation_logging.py -v`
-Expected: PASS. Kalau gagal dengan `device is None` (turn tidak tercatat), pastikan test Step 1 mendaftarkan row `Device` dengan `device_id="A4:CF:12:9B:00:9E"` di fixture setup — tambahkan setup itu di awal test kalau belum ada (pola sama seperti `test_ota.py` Task 3 Step 1, buat `Owner` dulu lalu `Device` yang menunjuk ke `owner.id`).
+Expected: PASS. Kalau gagal dengan `device is None` (turn tidak tercatat), pastikan test Step 1 mendaftarkan row `Device` dengan `device_id="A4:CF:12:9B:00:9E"` di fixture setup — tambahkan setup itu di awal test kalau belum ada (pola sama seperti `test_ota.py` Task 3 Step 1: buat `User` dulu, lalu `Owner` yang menunjuk `user.id`, baru `Device` yang menunjuk `owner.id`).
 
 - [ ] **Step 5: Jalankan seluruh test suite**
 
