@@ -8,6 +8,7 @@ authors = [
 requires-python = ">=3.11"
 dependencies = [
     "alembic>=1.19.2",
+    "argon2-cffi>=25.1.0",
     "asyncpg>=0.31.0",
     "cryptography>=50.0.1",
     "fastapi>=0.141.1",
@@ -16,6 +17,7 @@ dependencies = [
     "opuslib>=3.0.1",
     "pydantic>=2.13.5",
     "pydantic-settings>=2.15.0",
+    "pyjwt>=2.13.0",
     "sqlalchemy[asyncio]>=2.0.52",
     "uvicorn[standard]>=0.52.4",
     "websockets>=17.1",

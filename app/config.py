@@ -6,6 +6,7 @@ class Settings(BaseSettings):
 
     database_url: str = "postgresql+asyncpg://zora:zora_dev_only@localhost:5432/zora_bridge"
     secret_key: str = "dev-only-change-me-32-bytes-min!!"
+    jwt_secret: str = "dev-only-jwt-secret-change-me-32b!!"
 
     omnirouter_base_url: str = "http://localhost:20128/v1"
     omnirouter_api_key: str = ""
