@@ -109,11 +109,67 @@ export function useDeleteAgent() {
   });
 }
 
+export interface ProviderCred {
+  id: string;
+  kind: string; // llm|stt|tts|search|vision
+  provider_code: string;
+  config: Record<string, unknown>;
+  secret_last4: string;
+  fallback_of: string | null;
+  created_at: string;
+}
+
+export type ProviderCreateInput = {
+  kind: string;
+  provider_code: string;
+  config?: Record<string, unknown>;
+  secret: string;
+  fallback_of?: string | null;
+};
+
+export interface ProviderTestResult {
+  ok: boolean;
+  message: string;
+}
+
 export function useProviders() {
   return useQuery({
     queryKey: ["providers"],
-    queryFn: () => apiJson<unknown[]>("/api/providers"),
-    enabled: false,
+    queryFn: () => apiJson<ProviderCred[]>("/api/providers"),
+  });
+}
+
+export function useCreateProvider() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (body: ProviderCreateInput) =>
+      apiJson<ProviderCred>("/api/providers", { method: "POST", body: JSON.stringify(body) }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["providers"] });
+    },
+  });
+}
+
+export function useDeleteProvider() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const res = await apiFetch(`/api/providers/${id}`, { method: "DELETE" });
+      if (!res.ok) {
+        const text = await res.text().catch(() => "");
+        throw new Error(`API ${res.status}: ${text}`);
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["providers"] });
+    },
+  });
+}
+
+export function useTestProvider() {
+  return useMutation({
+    mutationFn: (id: string) =>
+      apiJson<ProviderTestResult>(`/api/providers/${id}/test`, { method: "POST" }),
   });
 }
 
