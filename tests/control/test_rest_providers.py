@@ -49,7 +49,7 @@ def test_delete_provider(client, auth_headers):
     assert r2.json() == []
 
 
-def test_test_connection_returns_placeholder(client, auth_headers):
+def test_test_connection_returns_placeholder_for_unimplemented_combo(client, auth_headers):
     create = client.post(
         "/api/providers",
         headers=auth_headers,
@@ -59,6 +59,50 @@ def test_test_connection_returns_placeholder(client, auth_headers):
     r = client.post(f"/api/providers/{provider_id}/test", headers=auth_headers)
     assert r.status_code == 200
     assert r.json()["ok"] is True
+    assert "belum diimplementasikan" in r.json()["message"]
+
+
+def test_test_connection_calls_real_omnirouter(client, auth_headers, httpx_mock):
+    httpx_mock.add_response(
+        method="GET",
+        url="http://localhost:20128/v1/models",
+        json={"data": [{"id": "model-a"}, {"id": "model-b"}]},
+    )
+
+    create = client.post(
+        "/api/providers",
+        headers=auth_headers,
+        json={
+            "kind": "llm",
+            "provider_code": "omnirouter",
+            "config": {"base_url": "http://localhost:20128/v1"},
+            "secret": "sk-test",
+        },
+    )
+    provider_id = create.json()["id"]
+
+    r = client.post(f"/api/providers/{provider_id}/test", headers=auth_headers)
+    assert r.status_code == 200
+    body = r.json()
+    assert body["ok"] is True
+    assert "2 model terbaca" in body["message"]
+
+
+def test_test_connection_reports_failure_without_crashing(client, auth_headers, httpx_mock):
+    httpx_mock.add_response(method="GET", url="https://api.groq.com/openai/v1/models", status_code=401)
+
+    create = client.post(
+        "/api/providers",
+        headers=auth_headers,
+        json={"kind": "stt", "provider_code": "groq", "secret": "bad-key"},
+    )
+    provider_id = create.json()["id"]
+
+    r = client.post(f"/api/providers/{provider_id}/test", headers=auth_headers)
+    assert r.status_code == 200  # test-connection tidak pernah 500 walau provider gagal
+    body = r.json()
+    assert body["ok"] is False
+    assert "401" in body["message"]
 
 
 def test_cannot_access_other_owner_provider(client, auth_headers, other_auth_headers):
