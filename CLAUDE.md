@@ -7,6 +7,9 @@ Status: **desain selesai, belum ada kode.** Dokumen yang mengikat:
 - [docs/superpowers/specs/2026-09-10-zora-bridge-system-design.md](docs/superpowers/specs/2026-09-10-zora-bridge-system-design.md) — arsitektur, kontrak device hasil riset firmware, model data, fase kerja. **Baca ini dulu sebelum nulis kode.**
 - [docs/superpowers/specs/2026-09-10-zora-bridge-ui-design.md](docs/superpowers/specs/2026-09-10-zora-bridge-ui-design.md) — tujuh layar dashboard + fiturnya.
 - [design/](design/) — mockup `.dc.html` tiap layar.
+- [docs/superpowers/plans/2026-09-10-fase1-voice-loop.md](docs/superpowers/plans/2026-09-10-fase1-voice-loop.md) — plan implementasi Fase 1 (voice loop inti), 10 task TDD.
+- [docs/superpowers/plans/2026-09-10-fase2-dashboard-control.md](docs/superpowers/plans/2026-09-10-fase2-dashboard-control.md) — plan implementasi Fase 2 (kontrol device + dashboard), 25 task.
+- [docs/superpowers/plans/2026-09-10-fase3-rbac.md](docs/superpowers/plans/2026-09-10-fase3-rbac.md) — plan implementasi Fase 3 (RBAC multi-user), 7 task.
 - [PLAN.md](PLAN.md) — catatan brainstorming awal; sebagian keputusannya sudah digantikan dokumen di atas.
 
 ## Ringkasan keputusan
@@ -25,6 +28,8 @@ Status: **desain selesai, belum ada kode.** Dokumen yang mengikat:
   3. **Tool MCP berbahaya (`self.reboot`, `self.upgrade_firmware`) tetap dieksekusi device walau gak dilist.** Bridge wajib pakai allowlist buat nyaring apa yang diekspos ke LLM.
 
 ## Urutan implementasi (belum dimulai)
+
+- **Aturan instalasi library**: Jangan tulis kode/config library manual. Pakai command resmi (`npx tailwindcss init -p`, `npm create vite@latest`, `alembic revision`, `npx tsc --init`, dll). Lebih cepat + akurat.
 
 **Fase 1 — voice loop inti**
 1. Init project (pyproject, struktur folder, Docker Compose app+Postgres, Alembic)
