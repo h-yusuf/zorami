@@ -24,29 +24,131 @@ _DOWNLINK_AUDIO_PARAMS = {
 _FRAME_DURATION_S = 0.06
 
 
-def _build_pipeline(mcp: McpClient) -> Pipeline:
-    # Fase 1: satu konfigurasi hardcoded. Fase 2 mengambil per-agent dari DB.
+_DEFAULT_SYSTEM_PROMPT = (
+    "Kamu Zora, asisten suara berbahasa Indonesia. Jawab singkat, "
+    "maksimal dua kalimat, tanpa markdown."
+)
+_DEFAULT_VOICE = "id_ID-news-medium"
+_HARI_INDONESIA = ["Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu", "Minggu"]
+
+
+async def _resolve_config(device_id: str) -> dict:
+    """Cari Device -> Agent yang di-assign + ProviderCred milik owner-nya.
+
+    Ini yang bikin dashboard (halaman Agents & Providers) beneran ngefek ke
+    voice loop - sebelumnya _build_pipeline 100% hardcoded dari .env, gak
+    peduli device-nya siapa atau agent apa yang di-assign di dashboard
+    (ditemukan lewat tes manual end-to-end).
+
+    Return dict: {"agent": dict|None, "providers": {kind: {provider_code,
+    config, secret}}}. `agent` None atau kind yang tidak ada di `providers`
+    berarti "pakai default dari .env" - fallback ini disengaja supaya dev
+    lokal tanpa dashboard tetap bisa jalan (spec §9 follow-up)."""
+    from sqlalchemy import select
+
+    from app.core.crypto import decrypt_secret
+    from app.core.db import get_sessionmaker
+    from app.core.models import Agent, Device, ProviderCred
+
+    session_maker = get_sessionmaker()
+    async with session_maker() as session:
+        result = await session.execute(select(Device).where(Device.device_id == device_id))
+        device = result.scalar_one_or_none()
+        if device is None:
+            return {"agent": None, "providers": {}}
+
+        agent_dict = None
+        if device.agent_id is not None:
+            agent = await session.get(Agent, device.agent_id)
+            if agent is not None:
+                agent_dict = {
+                    "system_prompt": agent.system_prompt,
+                    "llm_model": agent.llm_model,
+                    "temperature": agent.temperature,
+                    "max_tokens": agent.max_tokens,
+                    "tts_voice": agent.tts_voice,
+                    "tools_enabled": agent.tools_enabled or [],
+                }
+
+        result = await session.execute(
+            select(ProviderCred).where(ProviderCred.owner_id == device.owner_id)
+        )
+        providers: dict[str, dict] = {}
+        for pc in result.scalars().all():
+            if pc.kind in providers:
+                continue  # belum ada konsep "provider aktif" eksplisit - ambil yang pertama
+            providers[pc.kind] = {
+                "provider_code": pc.provider_code,
+                "config": pc.config or {},
+                "secret": decrypt_secret(pc.secret_encrypted),
+            }
+
+        return {"agent": agent_dict, "providers": providers}
+
+
+def _context_note() -> str:
+    """Suntik waktu server sekarang ke system prompt - tanpa ini LLM tidak
+    tahu tanggal/hari sebenarnya dan menebak (ditemukan lewat tes manual:
+    ditanya 'hari apa', LLM jawab beda-beda tiap dipanggil tanpa search)."""
+    from datetime import datetime, timedelta, timezone
+
+    from app.config import settings
+
+    now = datetime.now(timezone.utc) + timedelta(hours=settings.timezone_offset_hours)
+    hari = _HARI_INDONESIA[now.weekday()]
+    return (
+        f"\n\nKonteks waktu sekarang: hari {hari}, {now.strftime('%d %B %Y')}, "
+        f"pukul {now.strftime('%H:%M')} waktu setempat. Kalau ditanya hari atau "
+        "tanggal, jawab dari sini - jangan menebak."
+    )
+
+
+async def _build_pipeline(mcp: McpClient, device_id: str) -> Pipeline:
     from app.adapters.llm.omnirouter import OmnirouterAdapter
     from app.adapters.search.langsearch import LangSearchAdapter
     from app.adapters.stt.groq_whisper import GroqWhisperAdapter
     from app.adapters.tts.piper import PiperAdapter
     from app.config import settings
 
+    resolved = await _resolve_config(device_id)
+    agent = resolved["agent"]
+    providers = resolved["providers"]
+
+    llm_cfg = providers.get("llm")
+    stt_cfg = providers.get("stt")
+    tts_cfg = providers.get("tts")
+    search_cfg = providers.get("search")
+
+    llm = OmnirouterAdapter(
+        base_url=(llm_cfg["config"].get("base_url") if llm_cfg else settings.omnirouter_base_url),
+        api_key=(llm_cfg["secret"] if llm_cfg else settings.omnirouter_api_key),
+        model=(
+            agent["llm_model"]
+            if agent
+            else (llm_cfg["config"].get("model") if llm_cfg else settings.omnirouter_model)
+        ),
+    )
+    stt = GroqWhisperAdapter(api_key=(stt_cfg["secret"] if stt_cfg else settings.groq_api_key))
+    tts = PiperAdapter(
+        binary_path=(tts_cfg["config"].get("binary_path") if tts_cfg else settings.piper_binary_path),
+        model_path=(tts_cfg["config"].get("model_path") if tts_cfg else settings.piper_model_path),
+    )
+    search = LangSearchAdapter(
+        api_key=(search_cfg["secret"] if search_cfg else settings.langsearch_api_key)
+    )
+
+    system_prompt = (agent["system_prompt"] if agent else _DEFAULT_SYSTEM_PROMPT) + _context_note()
+
     return Pipeline(
-        stt=GroqWhisperAdapter(api_key=settings.groq_api_key),
-        llm=OmnirouterAdapter(
-            base_url=settings.omnirouter_base_url,
-            api_key=settings.omnirouter_api_key,
-            model=settings.omnirouter_model,
-        ),
-        tts=PiperAdapter(binary_path=settings.piper_binary_path, model_path=settings.piper_model_path),
-        voice="id_ID-news-medium",
-        system_prompt=(
-            "Kamu Zora, asisten suara berbahasa Indonesia. Jawab singkat, "
-            "maksimal dua kalimat, tanpa markdown."
-        ),
-        search=LangSearchAdapter(api_key=settings.langsearch_api_key),
+        stt=stt,
+        llm=llm,
+        tts=tts,
+        voice=(agent["tts_voice"] if agent else _DEFAULT_VOICE),
+        system_prompt=system_prompt,
+        search=search,
         mcp=mcp,
+        max_tokens=(agent["max_tokens"] if agent else 160),
+        temperature=(agent["temperature"] if agent else 0.7),
     )
 
 
@@ -60,7 +162,7 @@ async def device_websocket(
     session = DeviceSession(device_id=device_id)
     endpointer = Endpointer(silence_ms=800)
     mcp = McpClient(websocket.send_text, session_id=session.session_id)
-    pipeline = _build_pipeline(mcp)
+    pipeline = await _build_pipeline(mcp, device_id)
 
     pcm_buffer = bytearray()
     aborted = False

@@ -19,6 +19,20 @@ class _FakeTTS:
         return TTSResult(pcm_audio=b"\x00\x01" * 480, sample_rate=24000, latency_ms=200)
 
 
+class _SpyLLM:
+    """Nangkep kwargs beneran yang dikirim ke complete() - dipakai buat
+    mastiin Pipeline nge-thread max_tokens/temperature milik agent, bukan
+    selalu jatuh ke default 160/0.7 (bug yang ditemukan lewat tes manual:
+    Agent.max_tokens tersimpan di DB tapi tidak pernah dibaca pipeline)."""
+
+    def __init__(self):
+        self.calls: list[dict] = []
+
+    async def complete(self, messages, *, tools=None, max_tokens=160, temperature=0.7):
+        self.calls.append({"max_tokens": max_tokens, "temperature": temperature})
+        return LLMResponse(text="ok", tool_calls=[], latency_ms=100)
+
+
 class _FakeTTSNonOpusRate:
     """Simula Piper voice id_ID sungguhan, yang keluar di 22050Hz - bukan salah
     satu dari 5 sample rate valid Opus (8k/12k/16k/24k/48k)."""
@@ -135,3 +149,33 @@ async def test_handle_utterance_resamples_non_opus_rate_before_encoding():
     audio_frames = [e for e in events if e["kind"] == "audio_frame"]
     assert len(audio_frames) > 0
     assert events[-1]["kind"] == "tts_stop"
+
+
+async def test_handle_utterance_threads_custom_max_tokens_and_temperature():
+    spy = _SpyLLM()
+    pipeline = Pipeline(
+        stt=_FakeSTT(),
+        llm=spy,
+        tts=_FakeTTS(),
+        voice="id_ID-news-medium",
+        system_prompt="Kamu Zora.",
+        max_tokens=320,
+        temperature=0.3,
+    )
+
+    async for _ in pipeline.handle_utterance(pcm_audio=b"\x00" * 1000):
+        pass
+
+    assert spy.calls == [{"max_tokens": 320, "temperature": 0.3}]
+
+
+async def test_handle_utterance_defaults_match_previous_hardcoded_values():
+    spy = _SpyLLM()
+    pipeline = Pipeline(
+        stt=_FakeSTT(), llm=spy, tts=_FakeTTS(), voice="v", system_prompt="p"
+    )
+
+    async for _ in pipeline.handle_utterance(pcm_audio=b"\x00" * 1000):
+        pass
+
+    assert spy.calls == [{"max_tokens": 160, "temperature": 0.7}]

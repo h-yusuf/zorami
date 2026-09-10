@@ -32,11 +32,10 @@ def test_turn_is_logged_to_database(monkeypatch):
         async def synthesize(self, text, *, voice):
             return TTSResult(pcm_audio=b"\x00\x01" * 480, sample_rate=24000, latency_ms=50)
 
-    monkeypatch.setattr(
-        ws_module,
-        "_build_pipeline",
-        lambda mcp: Pipeline(stt=_FakeSTT(), llm=_FakeLLM(), tts=_FakeTTS(), voice="v", system_prompt="p"),
-    )
+    async def _fake_build_pipeline(mcp, device_id):
+        return Pipeline(stt=_FakeSTT(), llm=_FakeLLM(), tts=_FakeTTS(), voice="v", system_prompt="p")
+
+    monkeypatch.setattr(ws_module, "_build_pipeline", _fake_build_pipeline)
 
     async def _seed_device():
         session_maker = get_sessionmaker()

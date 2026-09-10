@@ -16,5 +16,8 @@ class Settings(BaseSettings):
     piper_model_path: str = "/models/id_ID-news-medium.onnx"
     langsearch_api_key: str = ""
 
+    # WIB (UTC+7) default - produk ini bahasa Indonesia-first (voice id_ID, dst).
+    timezone_offset_hours: int = 7
+
 
 settings = Settings()

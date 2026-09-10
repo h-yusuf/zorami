@@ -53,6 +53,8 @@ class Pipeline:
         system_prompt: str,
         search: SearchAdapter | None = None,
         mcp: "McpClient | None" = None,
+        max_tokens: int = 160,
+        temperature: float = 0.7,
     ):
         self._stt = stt
         self._llm = llm
@@ -61,6 +63,8 @@ class Pipeline:
         self._system_prompt = system_prompt
         self._search = search
         self._mcp = mcp
+        self._max_tokens = max_tokens
+        self._temperature = temperature
 
     async def _build_tool_schema(self) -> list[dict] | None:
         tools: list[dict] = []
@@ -92,7 +96,9 @@ class Pipeline:
         ]
 
         tools = await self._build_tool_schema()
-        llm_result = await self._llm.complete(messages=messages, tools=tools)
+        llm_result = await self._llm.complete(
+            messages=messages, tools=tools, max_tokens=self._max_tokens, temperature=self._temperature
+        )
 
         if llm_result.tool_calls:
             call = llm_result.tool_calls[0]
@@ -114,7 +120,9 @@ class Pipeline:
 
             messages.append({"role": "assistant", "content": None, "tool_calls": llm_result.tool_calls})
             messages.append({"role": "tool", "tool_call_id": call["id"], "content": tool_content})
-            llm_result = await self._llm.complete(messages=messages)
+            llm_result = await self._llm.complete(
+                messages=messages, max_tokens=self._max_tokens, temperature=self._temperature
+            )
 
         final_text = llm_result.text
         tts_result = await self._tts.synthesize(final_text, voice=self._voice)
