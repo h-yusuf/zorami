@@ -59,3 +59,28 @@ async def get_current_owner(
 @router.get("/me")
 async def me(owner_id: str = Depends(get_current_owner)):
     return {"owner_id": owner_id}
+
+
+async def get_current_owner_ws(token: str | None) -> str | None:
+    """Versi WebSocket dari get_current_owner. WebSocket browser tidak bisa kirim
+    header Authorization dari JS biasa, jadi token datang lewat query param dan
+    dependency injection HTTP biasa tidak berlaku di sini - decode & lookup manual.
+
+    Return None (bukan raise HTTPException) kalau token tidak ada/invalid atau owner
+    tidak ditemukan, supaya caller (monitor_ws) bisa close socket dengan code custom."""
+    if not token:
+        return None
+
+    user_id = decode_access_token(token)
+    if user_id is None:
+        return None
+
+    from app.core.db import get_sessionmaker
+
+    session_maker = get_sessionmaker()
+    async with session_maker() as db:
+        result = await db.execute(select(Owner).where(Owner.user_id == user_id))
+        owner = result.scalar_one_or_none()
+        if owner is None:
+            return None
+        return str(owner.id)
