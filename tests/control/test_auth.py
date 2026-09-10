@@ -29,3 +29,13 @@ def test_protected_endpoint_with_token(client, seeded_owner):
     r = client.get("/api/auth/me", headers={"Authorization": f"Bearer {token}"})
     assert r.status_code == 200
     assert r.json()["owner_id"] == login.json()["owner_id"]
+
+
+def test_me_returns_actual_email(client, seeded_owner):
+    # Regresi: dashboard sebelumnya nampilin email hardcoded di sidebar karena
+    # /api/auth/me tidak pernah mengembalikan email sama sekali.
+    login = client.post("/api/auth/login", json={"email": "owner@zora.local", "password": "testpass123"})
+    token = login.json()["access_token"]
+    r = client.get("/api/auth/me", headers={"Authorization": f"Bearer {token}"})
+    assert r.status_code == 200
+    assert r.json()["email"] == "owner@zora.local"

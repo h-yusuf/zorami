@@ -24,3 +24,14 @@ body {
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
 }
+
+/* Bar sinyal ambient di layar login - merepresentasikan bridge yang "mendengar".
+   Tiap bar punya durasi/delay beda (lihat LoginForm.tsx) biar gak sinkron kaku. */
+@keyframes signal-bar {
+  0%, 100% { transform: scaleY(0.25); }
+  50% { transform: scaleY(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .signal-bar { animation: none !important; transform: scaleY(0.6); }
+}

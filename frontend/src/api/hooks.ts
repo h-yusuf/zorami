@@ -31,6 +31,31 @@ export function useOverview() {
   });
 }
 
+export interface Me {
+  owner_id: string;
+  email: string;
+}
+
+export function useMe() {
+  return useQuery({
+    queryKey: ["me"],
+    queryFn: () => apiJson<Me>("/api/auth/me"),
+    staleTime: Infinity, // identitas akun tidak berubah selama sesi berjalan
+  });
+}
+
+export interface Health {
+  database: "ok" | "down";
+}
+
+export function useHealth() {
+  return useQuery({
+    queryKey: ["health"],
+    queryFn: () => apiJson<Health>("/api/health"),
+    refetchInterval: 30_000,
+  });
+}
+
 export interface Agent {
   id: string;
   name: string;

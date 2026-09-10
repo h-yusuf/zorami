@@ -9,6 +9,7 @@ import {
   Users,
 } from "lucide-react";
 import { getToken } from "../api/client";
+import { useHealth, useMe } from "../api/hooks";
 import { LoginForm } from "./LoginForm";
 
 interface NavItem {
@@ -57,6 +58,34 @@ const PAGE_META: Record<string, { title: string; subtitle: string }> = {
   "/conversations": { title: "Percakapan", subtitle: "Riwayat turn per device dan agent" },
   "/users-roles": { title: "Users & Roles", subtitle: "Kelola akses tim (Fase 3)" },
 };
+
+function AccountFooter() {
+  const { data: me, isLoading: meLoading } = useMe();
+  const { data: health } = useHealth();
+
+  const email = meLoading ? "" : (me?.email ?? "?");
+  const initial = email ? email[0].toUpperCase() : "?";
+  const dbLabel =
+    health === undefined ? "cek..." : health.database === "ok" ? "postgres ok" : "postgres down";
+
+  return (
+    <div className="flex flex-col gap-1.5 border-t border-border px-[18px] py-3.5">
+      <div className="flex items-center gap-2">
+        <div className="flex h-6 w-6 items-center justify-center rounded-[2px] bg-[#3A342A] text-[11px] font-bold text-amber">
+          {initial}
+        </div>
+        <div className="overflow-hidden text-ellipsis whitespace-nowrap text-[11.5px] text-text-secondary">
+          {email || "Memuat..."}
+        </div>
+      </div>
+      <div
+        className={`font-mono text-[9.5px] ${health?.database === "down" ? "text-danger" : "text-[#56534D]"}`}
+      >
+        v0.1.0-dev &middot; {dbLabel}
+      </div>
+    </div>
+  );
+}
 
 function Sidebar() {
   return (
@@ -114,19 +143,7 @@ function Sidebar() {
 
       <div className="grow" />
 
-      <div className="flex flex-col gap-1.5 border-t border-border px-[18px] py-3.5">
-        <div className="flex items-center gap-2">
-          <div className="flex h-6 w-6 items-center justify-center rounded-[2px] bg-[#3A342A] text-[11px] font-bold text-amber">
-            Y
-          </div>
-          <div className="overflow-hidden text-ellipsis whitespace-nowrap text-[11.5px] text-text-secondary">
-            yusuf@tspindonesia.com
-          </div>
-        </div>
-        <div className="font-mono text-[9.5px] text-[#56534D]">
-          v0.1.0-dev &middot; postgres ok
-        </div>
-      </div>
+      <AccountFooter />
     </div>
   );
 }

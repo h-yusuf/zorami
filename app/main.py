@@ -1,8 +1,10 @@
 import logging
 from pathlib import Path
 
-from fastapi import FastAPI
+from fastapi import Depends, FastAPI
 from fastapi.staticfiles import StaticFiles
+from sqlalchemy import text
+from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.exceptions import HTTPException as StarletteHTTPException
 from starlette.responses import Response
 from starlette.types import Scope
@@ -14,6 +16,7 @@ from app.control.rest.devices import router as devices_router
 from app.control.monitor import router as monitor_router
 from app.control.rest.overview import router as overview_router
 from app.control.rest.providers import router as providers_router
+from app.core.db import get_session
 from app.device.ota import ota_router
 from app.device.ws import ws_router
 
@@ -27,6 +30,19 @@ app.include_router(devices_router)
 app.include_router(conversations_router)
 app.include_router(overview_router)
 app.include_router(monitor_router)
+
+
+@app.get("/api/health")
+async def health(db: AsyncSession = Depends(get_session)):
+    """Cek koneksi Postgres beneran - dipakai sidebar dashboard. Sebelumnya
+    sidebar nampilin teks statis "postgres ok" yang tidak pernah menyentuh
+    database sama sekali."""
+    try:
+        await db.execute(text("SELECT 1"))
+        db_status = "ok"
+    except Exception:
+        db_status = "down"
+    return {"database": db_status}
 
 
 class SPAStaticFiles(StaticFiles):

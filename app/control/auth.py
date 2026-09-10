@@ -57,8 +57,10 @@ async def get_current_owner(
 
 
 @router.get("/me")
-async def me(owner_id: str = Depends(get_current_owner)):
-    return {"owner_id": owner_id}
+async def me(owner_id: str = Depends(get_current_owner), db: AsyncSession = Depends(get_session)):
+    owner = await db.get(Owner, owner_id)
+    user = await db.get(User, owner.user_id)
+    return {"owner_id": owner_id, "email": user.email}
 
 
 async def get_current_owner_ws(token: str | None) -> str | None:
