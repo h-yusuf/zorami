@@ -35,8 +35,8 @@ async def test_list_tools_pagination():
     client_holder: dict[str, McpClient] = {}
 
     async def mock_send(msg: str):
-        payload = json.loads(msg)
-        rpc_id = payload["id"]
+        envelope = json.loads(msg)
+        rpc_id = envelope["payload"]["id"]
         if rpc_id == 1:
             response = {
                 "jsonrpc": "2.0",
@@ -149,8 +149,29 @@ async def test_id_is_integer():
     asyncio.create_task(respond())
     await client.list_tools()
 
-    msg = json.loads(sent[0])
-    assert isinstance(msg["id"], int)
+    envelope = json.loads(sent[0])
+    assert envelope["type"] == "mcp"
+    assert isinstance(envelope["payload"]["id"], int)
+
+
+def test_outgoing_call_wrapped_in_mcp_envelope():
+    sent = []
+
+    async def mock_send(msg: str):
+        sent.append(msg)
+
+    async def run():
+        client = McpClient(mock_send, session_id="sess-123")
+        # Tidak menunggu balasan - cukup periksa envelope yang terkirim.
+        asyncio.create_task(client.list_tools())
+        await asyncio.sleep(0.01)
+
+    asyncio.run(run())
+
+    envelope = json.loads(sent[0])
+    assert envelope["session_id"] == "sess-123"
+    assert envelope["type"] == "mcp"
+    assert envelope["payload"]["method"] == "tools/list"
 
 
 def test_dangerous_tools_never_in_default_allowlist():

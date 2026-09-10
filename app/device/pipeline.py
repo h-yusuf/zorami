@@ -1,11 +1,16 @@
 import json
-from typing import AsyncIterator, TypedDict
+from typing import TYPE_CHECKING, AsyncIterator, TypedDict
 
 from app.adapters.llm.base import LLMAdapter
 from app.adapters.search.base import SearchAdapter
 from app.adapters.stt.base import STTAdapter
 from app.adapters.tts.base import TTSAdapter
 from app.device.opus_codec import encode as opus_encode
+
+if TYPE_CHECKING:
+    from app.device.mcp_client import McpClient
+
+_SEARCH_TOOL_NAME = "web_search"
 
 _SEARCH_TOOL_SCHEMA = [
     {
@@ -38,6 +43,7 @@ class Pipeline:
         voice: str,
         system_prompt: str,
         search: SearchAdapter | None = None,
+        mcp: "McpClient | None" = None,
     ):
         self._stt = stt
         self._llm = llm
@@ -45,6 +51,27 @@ class Pipeline:
         self._voice = voice
         self._system_prompt = system_prompt
         self._search = search
+        self._mcp = mcp
+
+    async def _build_tool_schema(self) -> list[dict] | None:
+        tools: list[dict] = []
+        if self._search is not None:
+            tools.append(_SEARCH_TOOL_SCHEMA[0])
+        if self._mcp is not None:
+            for tool in await self._mcp.get_allowed_tools():
+                tools.append(
+                    {
+                        "type": "function",
+                        "function": {
+                            "name": tool["name"],
+                            "description": tool.get("description", ""),
+                            "parameters": tool.get(
+                                "inputSchema", {"type": "object", "properties": {}}
+                            ),
+                        },
+                    }
+                )
+        return tools or None
 
     async def handle_utterance(self, pcm_audio: bytes) -> AsyncIterator[OutgoingEvent]:
         stt_result = await self._stt.transcribe(pcm_audio, sample_rate=16000)
@@ -55,21 +82,29 @@ class Pipeline:
             {"role": "user", "content": stt_result.text},
         ]
 
-        tools = _SEARCH_TOOL_SCHEMA if self._search is not None else None
+        tools = await self._build_tool_schema()
         llm_result = await self._llm.complete(messages=messages, tools=tools)
 
-        if llm_result.tool_calls and self._search is not None:
+        if llm_result.tool_calls:
             call = llm_result.tool_calls[0]
-            args = json.loads(call["function"]["arguments"])
-            search_result = await self._search.search(args["query"], max_results=3)
+            tool_name = call["function"]["name"]
+            args = json.loads(call["function"]["arguments"] or "{}")
 
-            search_context = "\n".join(
-                f"- {r['title']}: {r['snippet']}" for r in search_result.results
-            )
+            if tool_name == _SEARCH_TOOL_NAME and self._search is not None:
+                search_result = await self._search.search(args["query"], max_results=3)
+                tool_content = "\n".join(
+                    f"- {r['title']}: {r['snippet']}" for r in search_result.results
+                )
+            elif self._mcp is not None:
+                mcp_result = await self._mcp.call_tool(tool_name, args)
+                tool_content = "\n".join(
+                    part.get("text", "") for part in mcp_result.get("content", [])
+                )
+            else:
+                tool_content = ""
+
             messages.append({"role": "assistant", "content": None, "tool_calls": llm_result.tool_calls})
-            messages.append(
-                {"role": "tool", "tool_call_id": call["id"], "content": search_context}
-            )
+            messages.append({"role": "tool", "tool_call_id": call["id"], "content": tool_content})
             llm_result = await self._llm.complete(messages=messages)
 
         final_text = llm_result.text

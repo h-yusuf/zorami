@@ -26,8 +26,16 @@ DANGEROUS_TOOLS: set[str] = {
 class McpClient:
     """JSON-RPC client ke device MCP server via WebSocket session."""
 
-    def __init__(self, ws_send_fn, *, call_timeout: float = 10.0, allowlist: set[str] | None = None):
+    def __init__(
+        self,
+        ws_send_fn,
+        *,
+        session_id: str | None = None,
+        call_timeout: float = 10.0,
+        allowlist: set[str] | None = None,
+    ):
         self._send = ws_send_fn  # async fn(str) -> None
+        self._session_id = session_id
         self._call_timeout = call_timeout
         self._allowlist = allowlist or DEFAULT_ALLOWLIST
         self._pending: dict[int, asyncio.Future] = {}
@@ -106,7 +114,14 @@ class McpClient:
         rpc_id = self._next_id
         self._next_id += 1
 
-        msg = json.dumps({"jsonrpc": "2.0", "id": rpc_id, "method": method, "params": params})
+        # Pesan mcp server->device WAJIB dibungkus envelope {session_id, type, payload}
+        # (spec §4) - device tidak menerima JSON-RPC mentah sebagai pesan top-level.
+        envelope = {
+            "session_id": self._session_id,
+            "type": "mcp",
+            "payload": {"jsonrpc": "2.0", "id": rpc_id, "method": method, "params": params},
+        }
+        msg = json.dumps(envelope)
 
         future: asyncio.Future = asyncio.get_event_loop().create_future()
         self._pending[rpc_id] = future

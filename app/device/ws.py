@@ -7,6 +7,7 @@ from fastapi import APIRouter, Header, WebSocket, WebSocketDisconnect
 logger = logging.getLogger(__name__)
 
 from app.device.endpointer import Endpointer
+from app.device.mcp_client import McpClient
 from app.device.opus_codec import decode as opus_decode
 from app.device.pipeline import Pipeline
 from app.device.session import DeviceSession
@@ -23,7 +24,7 @@ _DOWNLINK_AUDIO_PARAMS = {
 _FRAME_DURATION_S = 0.06
 
 
-def _build_pipeline() -> Pipeline:
+def _build_pipeline(mcp: McpClient) -> Pipeline:
     # Fase 1: satu konfigurasi hardcoded. Fase 2 mengambil per-agent dari DB.
     from app.adapters.llm.omnirouter import OmnirouterAdapter
     from app.adapters.search.searxng import SearxngAdapter
@@ -45,6 +46,7 @@ def _build_pipeline() -> Pipeline:
             "maksimal dua kalimat, tanpa markdown."
         ),
         search=SearxngAdapter(base_url=settings.searxng_base_url),
+        mcp=mcp,
     )
 
 
@@ -57,10 +59,12 @@ async def device_websocket(
     await websocket.accept()
     session = DeviceSession(device_id=device_id)
     endpointer = Endpointer(silence_ms=800)
-    pipeline = _build_pipeline()
+    mcp = McpClient(websocket.send_text, session_id=session.session_id)
+    pipeline = _build_pipeline(mcp)
 
     pcm_buffer = bytearray()
     aborted = False
+    mcp_initialize_task: asyncio.Task | None = None
 
     try:
         raw_hello = await websocket.receive_text()
@@ -78,6 +82,14 @@ async def device_websocket(
             )
         )
 
+        # Kirim initialize sekali per koneksi - satu-satunya isi balasannya yang
+        # dipakai firmware adalah URL+token vision kamera (spec §5). Tidak ada
+        # gerbang di firmware sebelum tools/list/tools/call, tapi tetap dikirim
+        # supaya vision URL (kalau nanti dipakai) sempat di-set device. Referensi
+        # task-nya DISIMPAN dan dibatalkan di finally - fire-and-forget murni bikin
+        # task ini hidup sampai 10s call_timeout walau koneksi sudah lama tertutup.
+        mcp_initialize_task = asyncio.create_task(mcp.initialize())
+
         while True:
             message = await websocket.receive()
             if message["type"] == "websocket.disconnect":
@@ -93,6 +105,11 @@ async def device_websocket(
                         session.state = "listening"
                         pcm_buffer.clear()
                         aborted = False
+
+                elif msg_type == "mcp":
+                    # Balasan device atas tools/list atau tools/call kita - JSON-RPC
+                    # asli ada di payload["payload"] (envelope spec §4).
+                    await mcp.handle_response(json.dumps(payload.get("payload", {})))
 
                 elif msg_type == "abort":
                     aborted = True
@@ -209,6 +226,9 @@ async def device_websocket(
 
     except WebSocketDisconnect:
         pass
+    finally:
+        if mcp_initialize_task is not None and not mcp_initialize_task.done():
+            mcp_initialize_task.cancel()
 
 
 async def _log_turn(*, device_id: str, session_id: str, user_text: str, assistant_text: str) -> None:

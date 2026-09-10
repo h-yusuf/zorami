@@ -35,7 +35,7 @@ def test_turn_is_logged_to_database(monkeypatch):
     monkeypatch.setattr(
         ws_module,
         "_build_pipeline",
-        lambda: Pipeline(stt=_FakeSTT(), llm=_FakeLLM(), tts=_FakeTTS(), voice="v", system_prompt="p"),
+        lambda mcp: Pipeline(stt=_FakeSTT(), llm=_FakeLLM(), tts=_FakeTTS(), voice="v", system_prompt="p"),
     )
 
     async def _seed_device():
