@@ -1,0 +1,102 @@
+import uuid
+from datetime import datetime, timedelta, timezone
+
+from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.control.auth import get_current_owner
+from app.control.schemas import DeviceOut, DeviceUpdate
+from app.core.db import get_session
+from app.core.models import Device
+
+router = APIRouter(prefix="/api/devices", tags=["devices"])
+
+ONLINE_WINDOW = timedelta(minutes=2)
+
+
+async def _get_owned_device(device_id: str, owner_id: str, db: AsyncSession) -> Device:
+    try:
+        device_uuid = uuid.UUID(device_id)
+    except ValueError:
+        raise HTTPException(status_code=404, detail="Device tidak ditemukan")
+
+    result = await db.execute(
+        select(Device).where(Device.id == device_uuid, Device.owner_id == uuid.UUID(owner_id))
+    )
+    device = result.scalar_one_or_none()
+    if device is None:
+        raise HTTPException(status_code=404, detail="Device tidak ditemukan")
+    return device
+
+
+def _is_online(device: Device) -> bool:
+    if device.last_seen_at is None:
+        return False
+    last_seen = device.last_seen_at
+    if last_seen.tzinfo is None:
+        last_seen = last_seen.replace(tzinfo=timezone.utc)
+    return datetime.now(timezone.utc) - last_seen <= ONLINE_WINDOW
+
+
+def _to_out(device: Device) -> DeviceOut:
+    return DeviceOut(
+        id=str(device.id),
+        device_id=device.device_id,
+        client_id=device.client_id,
+        alias=device.alias,
+        agent_id=str(device.agent_id) if device.agent_id else None,
+        board=device.board,
+        firmware_version=device.firmware_version,
+        last_seen_at=device.last_seen_at,
+        created_at=device.created_at,
+        online=_is_online(device),
+    )
+
+
+@router.get("", response_model=list[DeviceOut])
+async def list_devices(
+    owner_id: str = Depends(get_current_owner), db: AsyncSession = Depends(get_session)
+):
+    result = await db.execute(select(Device).where(Device.owner_id == uuid.UUID(owner_id)))
+    return [_to_out(d) for d in result.scalars().all()]
+
+
+@router.get("/{device_id}", response_model=DeviceOut)
+async def get_device(
+    device_id: str,
+    owner_id: str = Depends(get_current_owner),
+    db: AsyncSession = Depends(get_session),
+):
+    device = await _get_owned_device(device_id, owner_id, db)
+    return _to_out(device)
+
+
+@router.put("/{device_id}", response_model=DeviceOut)
+async def update_device(
+    device_id: str,
+    body: DeviceUpdate,
+    owner_id: str = Depends(get_current_owner),
+    db: AsyncSession = Depends(get_session),
+):
+    device = await _get_owned_device(device_id, owner_id, db)
+    updates = body.model_dump(exclude_unset=True)
+    if "agent_id" in updates:
+        raw = updates.pop("agent_id")
+        device.agent_id = uuid.UUID(raw) if raw else None
+    for field, value in updates.items():
+        setattr(device, field, value)
+    await db.commit()
+    await db.refresh(device)
+    return _to_out(device)
+
+
+@router.delete("/{device_id}", status_code=204)
+async def delete_device(
+    device_id: str,
+    owner_id: str = Depends(get_current_owner),
+    db: AsyncSession = Depends(get_session),
+):
+    device = await _get_owned_device(device_id, owner_id, db)
+    await db.delete(device)
+    await db.commit()

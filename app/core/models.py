@@ -69,7 +69,7 @@ class Device(Base):
 
     id: Mapped[uuid.UUID] = mapped_column(GUID(), primary_key=True, default=uuid.uuid4)
     owner_id: Mapped[uuid.UUID] = mapped_column(GUID(), ForeignKey("owners.id"), index=True)
-    agent_id: Mapped[uuid.UUID | None] = mapped_column(GUID(), nullable=True)
+    agent_id: Mapped[uuid.UUID | None] = mapped_column(GUID(), ForeignKey("agents.id"), nullable=True)
     device_id: Mapped[str] = mapped_column(String(17), unique=True)  # MAC, format AA:BB:CC:DD:EE:FF
     client_id: Mapped[str] = mapped_column(String(64))
     alias: Mapped[str] = mapped_column(String(120), default="Zora")
@@ -103,9 +103,54 @@ class Conversation(Base):
     id: Mapped[uuid.UUID] = mapped_column(GUID(), primary_key=True, default=uuid.uuid4)
     owner_id: Mapped[uuid.UUID] = mapped_column(GUID(), ForeignKey("owners.id"), index=True)
     device_id: Mapped[uuid.UUID] = mapped_column(GUID(), ForeignKey("devices.id"), index=True)
+    agent_id: Mapped[uuid.UUID | None] = mapped_column(GUID(), ForeignKey("agents.id"), nullable=True)
     session_id: Mapped[str] = mapped_column(String(64))
     title: Mapped[str | None] = mapped_column(String(200), nullable=True)
     started_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
+    )
+
+
+class Agent(Base):
+    __tablename__ = "agents"
+
+    id: Mapped[uuid.UUID] = mapped_column(GUID(), primary_key=True, default=uuid.uuid4)
+    owner_id: Mapped[uuid.UUID] = mapped_column(GUID(), ForeignKey("owners.id"), index=True)
+    name: Mapped[str] = mapped_column(String(120))
+    system_prompt: Mapped[str] = mapped_column(Text, default="")
+    llm_model: Mapped[str] = mapped_column(String(120), default="gpt-4o-mini")
+    temperature: Mapped[float] = mapped_column(default=0.7)
+    max_tokens: Mapped[int] = mapped_column(default=256)
+    tts_provider: Mapped[str] = mapped_column(String(64), default="piper")
+    tts_voice: Mapped[str] = mapped_column(String(64), default="id_ID")
+    emotion_level: Mapped[str] = mapped_column(String(32), default="medium")
+    tools_enabled: Mapped[list] = mapped_column(_json_type(), default=list)
+    memory_enabled: Mapped[bool] = mapped_column(default=False)
+    chat_log_level: Mapped[int] = mapped_column(default=1)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        default=lambda: datetime.now(timezone.utc),
+        onupdate=lambda: datetime.now(timezone.utc),
+    )
+
+
+class ProviderCred(Base):
+    __tablename__ = "provider_creds"
+
+    id: Mapped[uuid.UUID] = mapped_column(GUID(), primary_key=True, default=uuid.uuid4)
+    owner_id: Mapped[uuid.UUID] = mapped_column(GUID(), ForeignKey("owners.id"), index=True)
+    kind: Mapped[str] = mapped_column(String(16))  # llm|stt|tts|search|vision
+    provider_code: Mapped[str] = mapped_column(String(64))
+    config: Mapped[dict] = mapped_column(_json_type(), default=dict)
+    secret_encrypted: Mapped[str] = mapped_column(Text)
+    secret_last4: Mapped[str] = mapped_column(String(8))
+    fallback_of: Mapped[uuid.UUID | None] = mapped_column(
+        GUID(), ForeignKey("provider_creds.id"), nullable=True
+    )
+    created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
     )
 
