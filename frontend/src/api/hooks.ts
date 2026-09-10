@@ -240,10 +240,71 @@ export function useClaimDevice() {
   });
 }
 
-export function useConversations() {
+export interface ConversationSummary {
+  id: string;
+  device_id: string;
+  agent_id: string | null;
+  session_id: string;
+  title: string | null;
+  started_at: string;
+  turn_count: number;
+}
+
+export interface Message {
+  id: string;
+  role: string;
+  text: string;
+  provider_used: Record<string, unknown> | null;
+  latency_ms: Record<string, unknown> | null;
+  audio_path: string | null;
+  created_at: string;
+}
+
+export interface ConversationDetail extends ConversationSummary {
+  messages: Message[];
+}
+
+export type ConversationFilters = {
+  device_id?: string;
+  date_from?: string;
+  date_to?: string;
+  q?: string;
+};
+
+export function useConversations(filters: ConversationFilters = {}) {
+  const params = new URLSearchParams();
+  if (filters.device_id) params.set("device_id", filters.device_id);
+  if (filters.date_from) params.set("date_from", filters.date_from);
+  if (filters.date_to) params.set("date_to", filters.date_to);
+  if (filters.q) params.set("q", filters.q);
+  const qs = params.toString();
+
   return useQuery({
-    queryKey: ["conversations"],
-    queryFn: () => apiJson<unknown[]>("/api/conversations"),
-    enabled: false,
+    queryKey: ["conversations", filters],
+    queryFn: () => apiJson<ConversationSummary[]>(`/api/conversations${qs ? `?${qs}` : ""}`),
+  });
+}
+
+export function useConversationDetail(id: string | null) {
+  return useQuery({
+    queryKey: ["conversations", id],
+    queryFn: () => apiJson<ConversationDetail>(`/api/conversations/${id}`),
+    enabled: !!id,
+  });
+}
+
+export function useDeleteConversation() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const res = await apiFetch(`/api/conversations/${id}`, { method: "DELETE" });
+      if (!res.ok) {
+        const text = await res.text().catch(() => "");
+        throw new Error(`API ${res.status}: ${text}`);
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["conversations"] });
+    },
   });
 }
