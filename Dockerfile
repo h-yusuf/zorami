@@ -26,6 +26,7 @@ RUN uv sync --frozen --no-install-project --no-dev
 COPY app/ app/
 COPY alembic/ alembic/
 COPY alembic.ini ./
+COPY models/ models/
 COPY --from=frontend-build /app/frontend/dist frontend/dist
 
 RUN uv sync --frozen --no-dev

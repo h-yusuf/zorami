@@ -28,6 +28,11 @@ services:
       # Di dalam jaringan compose, host Postgres adalah nama service "postgres",
       # bukan "localhost" - override apa pun yang ada di .env.
       ZORA_DATABASE_URL: postgresql+asyncpg://zora:zora_dev_only@postgres:5432/zora_bridge
+      # .env berisi path absolut ke mesin host (.venv/bin/piper, models/...) yang
+      # tidak ada di dalam container - override ke path di image (lihat Dockerfile:
+      # uv sync menaruh binary Piper di /app/.venv/bin, model di-COPY ke /app/models).
+      ZORA_PIPER_BINARY_PATH: /app/.venv/bin/piper
+      ZORA_PIPER_MODEL_PATH: /app/models/id_ID-news_tts-medium.onnx
     ports:
       - "8000:8000"
     depends_on:
