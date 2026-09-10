@@ -1,7 +1,10 @@
 import asyncio
 import json
+import logging
 
 from fastapi import APIRouter, Header, WebSocket, WebSocketDisconnect
+
+logger = logging.getLogger(__name__)
 
 from app.device.endpointer import Endpointer
 from app.device.opus_codec import decode as opus_decode
@@ -116,60 +119,80 @@ async def device_websocket(
                     stt_text = ""
                     assistant_text_parts: list[str] = []
 
-                    async for out_event in pipeline.handle_utterance(utterance_pcm):
-                        if aborted:
-                            break
-                        kind = out_event["kind"]
-                        if kind == "stt":
-                            stt_text = out_event["text"]
-                            await websocket.send_text(
-                                json.dumps(
-                                    {
-                                        "session_id": session.session_id,
-                                        "type": "stt",
-                                        "text": out_event["text"],
-                                    }
+                    try:
+                        async for out_event in pipeline.handle_utterance(utterance_pcm):
+                            if aborted:
+                                break
+                            kind = out_event["kind"]
+                            if kind == "stt":
+                                stt_text = out_event["text"]
+                                await websocket.send_text(
+                                    json.dumps(
+                                        {
+                                            "session_id": session.session_id,
+                                            "type": "stt",
+                                            "text": out_event["text"],
+                                        }
+                                    )
                                 )
-                            )
-                        elif kind == "tts_start":
-                            await websocket.send_text(
-                                json.dumps(
-                                    {
-                                        "session_id": session.session_id,
-                                        "type": "tts",
-                                        "state": "start",
-                                    }
+                            elif kind == "tts_start":
+                                await websocket.send_text(
+                                    json.dumps(
+                                        {
+                                            "session_id": session.session_id,
+                                            "type": "tts",
+                                            "state": "start",
+                                        }
+                                    )
                                 )
-                            )
-                        elif kind == "tts_sentence":
-                            assistant_text_parts.append(out_event["text"])
-                            await websocket.send_text(
-                                json.dumps(
-                                    {
-                                        "session_id": session.session_id,
-                                        "type": "tts",
-                                        "state": "sentence_start",
-                                        "text": out_event["text"],
-                                    }
+                            elif kind == "tts_sentence":
+                                assistant_text_parts.append(out_event["text"])
+                                await websocket.send_text(
+                                    json.dumps(
+                                        {
+                                            "session_id": session.session_id,
+                                            "type": "tts",
+                                            "state": "sentence_start",
+                                            "text": out_event["text"],
+                                        }
+                                    )
                                 )
-                            )
-                        elif kind == "audio_frame":
-                            # Kirim seirama waktu nyata - antrean device cuma 20 frame
-                            # (1.2s), kelebihan kirim dibuang diam-diam (spec §4.6).
-                            await websocket.send_bytes(out_event["data"])
-                            await asyncio.sleep(_FRAME_DURATION_S)
-                        elif kind == "tts_stop":
-                            # Log DULU sebelum mengirim "tts stop" - device (atau test
-                            # client) boleh memutus koneksi begitu menerima sinyal stop,
-                            # jadi menulis DB setelah mengirimnya berisiko race dengan
-                            # disconnect yang membatalkan task ini di tengah jalan.
-                            if not aborted:
-                                await _log_turn(
-                                    device_id=device_id,
-                                    session_id=session.session_id,
-                                    user_text=stt_text,
-                                    assistant_text=" ".join(assistant_text_parts),
+                            elif kind == "audio_frame":
+                                # Kirim seirama waktu nyata - antrean device cuma 20 frame
+                                # (1.2s), kelebihan kirim dibuang diam-diam (spec §4.6).
+                                await websocket.send_bytes(out_event["data"])
+                                await asyncio.sleep(_FRAME_DURATION_S)
+                            elif kind == "tts_stop":
+                                # Log DULU sebelum mengirim "tts stop" - device (atau test
+                                # client) boleh memutus koneksi begitu menerima sinyal stop,
+                                # jadi menulis DB setelah mengirimnya berisiko race dengan
+                                # disconnect yang membatalkan task ini di tengah jalan.
+                                if not aborted:
+                                    await _log_turn(
+                                        device_id=device_id,
+                                        session_id=session.session_id,
+                                        user_text=stt_text,
+                                        assistant_text=" ".join(assistant_text_parts),
+                                    )
+                                await websocket.send_text(
+                                    json.dumps(
+                                        {
+                                            "session_id": session.session_id,
+                                            "type": "tts",
+                                            "state": "stop",
+                                        }
+                                    )
                                 )
+                    except Exception:
+                        # Kegagalan provider (STT/LLM/TTS/search) TIDAK BOLEH menjatuhkan
+                        # koneksi WebSocket - device harus tetap bisa mencoba turn
+                        # berikutnya tanpa reconnect + hello ulang. Kirim `tts stop` supaya
+                        # device tidak menggantung di state Speaking menunggu audio yang
+                        # tidak akan pernah datang.
+                        logger.exception(
+                            "Turn gagal untuk device %s (session %s)", device_id, session.session_id
+                        )
+                        try:
                             await websocket.send_text(
                                 json.dumps(
                                     {
@@ -179,6 +202,8 @@ async def device_websocket(
                                     }
                                 )
                             )
+                        except Exception:
+                            pass  # koneksi sudah putus - tidak ada lagi yang bisa dikirim
 
                     session.state = "listening" if session.listen_mode == "auto" else "idle"
 
