@@ -1,0 +1,34 @@
+[project]
+name = "zora-bridge"
+version = "0.1.0"
+description = "Add your description here"
+authors = [
+    { name = "h-yusuf", email = "hafidhy288@gmail.com" }
+]
+requires-python = ">=3.11"
+dependencies = [
+    "alembic>=1.19.2",
+    "asyncpg>=0.31.0",
+    "cryptography>=50.0.1",
+    "fastapi>=0.141.1",
+    "httpx>=0.28.1",
+    "openai>=3.11.0",
+    "opuslib>=3.0.1",
+    "pydantic>=2.13.5",
+    "pydantic-settings>=2.15.0",
+    "sqlalchemy[asyncio]>=2.0.52",
+    "uvicorn[standard]>=0.52.4",
+    "websockets>=17.1",
+]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+
+[dependency-groups]
+dev = [
+    "aiosqlite>=0.22.1",
+    "psycopg2-binary>=2.9.13",
+    "pytest>=9.1.1",
+    "pytest-asyncio>=1.4.0",
+    "pytest-httpx>=0.36.2",
+]
