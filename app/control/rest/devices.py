@@ -3,12 +3,13 @@ from datetime import datetime, timedelta, timezone
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import select
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.control.auth import get_current_owner
-from app.control.schemas import DeviceOut, DeviceUpdate
+from app.control.schemas import DeviceClaimIn, DeviceClaimOut, DeviceOut, DeviceUpdate
 from app.core.db import get_session
-from app.core.models import Device
+from app.core.models import ActivationCode, Device
 
 router = APIRouter(prefix="/api/devices", tags=["devices"])
 
@@ -62,6 +63,28 @@ async def list_devices(
     return [_to_out(d) for d in result.scalars().all()]
 
 
+@router.post("/claim", response_model=DeviceClaimOut)
+async def claim_device(
+    body: DeviceClaimIn,
+    owner_id: str = Depends(get_current_owner),
+    db: AsyncSession = Depends(get_session),
+):
+    now = datetime.now(timezone.utc)
+    result = await db.execute(select(ActivationCode).where(ActivationCode.code == body.code))
+    activation = result.scalar_one_or_none()
+
+    if activation is None or activation.expires_at < now:
+        raise HTTPException(status_code=404, detail="Kode aktivasi tidak ditemukan atau kedaluwarsa")
+
+    if activation.claimed_at is not None:
+        raise HTTPException(status_code=409, detail="Kode aktivasi sudah diklaim")
+
+    activation.claimed_at = now
+    activation.claimed_by_owner_id = uuid.UUID(owner_id)
+    await db.commit()
+    return DeviceClaimOut(code=activation.code)
+
+
 @router.get("/{device_id}", response_model=DeviceOut)
 async def get_device(
     device_id: str,
@@ -99,4 +122,11 @@ async def delete_device(
 ):
     device = await _get_owned_device(device_id, owner_id, db)
     await db.delete(device)
-    await db.commit()
+    try:
+        await db.commit()
+    except IntegrityError:
+        await db.rollback()
+        raise HTTPException(
+            status_code=409,
+            detail="Device masih punya riwayat percakapan tersimpan dan tidak bisa dihapus.",
+        )

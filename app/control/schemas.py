@@ -91,6 +91,15 @@ class DeviceUpdate(BaseModel):
     agent_id: Optional[str] = None
 
 
+class DeviceClaimIn(BaseModel):
+    code: str
+
+
+class DeviceClaimOut(BaseModel):
+    code: str
+    claimed: bool = True
+
+
 class ConversationOut(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 

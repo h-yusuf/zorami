@@ -173,11 +173,70 @@ export function useTestProvider() {
   });
 }
 
+export interface Device {
+  id: string;
+  device_id: string; // MAC
+  client_id: string;
+  alias: string | null;
+  agent_id: string | null;
+  board: string | null;
+  firmware_version: string | null;
+  last_seen_at: string | null;
+  created_at: string;
+  online: boolean;
+}
+
+export type DeviceUpdateInput = {
+  alias?: string | null;
+  agent_id?: string | null;
+};
+
 export function useDevices() {
   return useQuery({
     queryKey: ["devices"],
-    queryFn: () => apiJson<unknown[]>("/api/devices"),
-    enabled: false,
+    queryFn: () => apiJson<Device[]>("/api/devices"),
+    refetchInterval: 15000,
+  });
+}
+
+export function useUpdateDevice() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, body }: { id: string; body: DeviceUpdateInput }) =>
+      apiJson<Device>(`/api/devices/${id}`, { method: "PUT", body: JSON.stringify(body) }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["devices"] });
+    },
+  });
+}
+
+export function useDeleteDevice() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const res = await apiFetch(`/api/devices/${id}`, { method: "DELETE" });
+      if (!res.ok) {
+        const text = await res.text().catch(() => "");
+        throw new Error(`API ${res.status}: ${text}`);
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["devices"] });
+    },
+  });
+}
+
+export function useClaimDevice() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (code: string) =>
+      apiJson<{ code: string; claimed: boolean }>("/api/devices/claim", {
+        method: "POST",
+        body: JSON.stringify({ code }),
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["devices"] });
+    },
   });
 }
 
