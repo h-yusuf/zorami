@@ -1,52 +1,20 @@
 import { useState } from "react";
 import { login } from "../api/client";
 
-const SIGNAL_BARS = [
-  { color: "var(--color-amber)", duration: "1.6s", delay: "0s" },
-  { color: "var(--color-mint)", duration: "1.1s", delay: "-0.4s" },
-  { color: "var(--color-amber)", duration: "1.9s", delay: "-0.9s" },
-  { color: "var(--color-mint)", duration: "1.3s", delay: "-0.2s" },
-  { color: "var(--color-amber)", duration: "1.5s", delay: "-1.1s" },
-  { color: "var(--color-mint)", duration: "1.8s", delay: "-0.6s" },
-];
-
-function SignalBars() {
+function StatusPulse() {
   return (
-    <div className="flex h-10 items-end justify-center gap-[5px]" aria-hidden="true">
-      {SIGNAL_BARS.map((bar, i) => (
-        <span
-          key={i}
-          className="signal-bar w-[3px] origin-bottom rounded-[1px]"
-          style={{
-            height: "100%",
-            backgroundColor: bar.color,
-            animation: `signal-bar ${bar.duration} ease-in-out infinite`,
-            animationDelay: bar.delay,
-          }}
-        />
-      ))}
+    <div className="flex items-center gap-2">
+      <span className="status-pulse h-1.5 w-1.5 rounded-full bg-mint" style={{ animation: "status-pulse 2s ease-in-out infinite" }} aria-hidden="true" />
+      <span className="font-mono text-[10px] tracking-[0.08em] text-text-dim">
+        BRIDGE ONLINE
+      </span>
     </div>
-  );
-}
-
-function PanelCorners() {
-  const base = "absolute h-2.5 w-2.5 border-border";
-  return (
-    <>
-      <span className={`${base} left-2 top-2 border-l border-t`} aria-hidden="true" />
-      <span className={`${base} right-2 top-2 border-r border-t`} aria-hidden="true" />
-      <span className={`${base} bottom-2 left-2 border-b border-l`} aria-hidden="true" />
-      <span className={`${base} bottom-2 right-2 border-b border-r`} aria-hidden="true" />
-    </>
   );
 }
 
 function FieldLabel({ children, htmlFor }: { children: string; htmlFor: string }) {
   return (
-    <label
-      htmlFor={htmlFor}
-      className="mb-1.5 block font-mono text-[10px] font-semibold tracking-[0.12em] text-text-dim uppercase"
-    >
+    <label htmlFor={htmlFor} className="mb-1.5 block text-[12.5px] font-medium text-text-secondary">
       {children}
     </label>
   );
@@ -73,17 +41,25 @@ export function LoginForm() {
   }
 
   return (
-    <div className="flex h-screen items-center justify-center bg-bg px-4 text-text">
-      <div className="relative w-[340px] border border-border bg-surface p-7">
-        <PanelCorners />
+    <div className="flex min-h-screen items-center justify-center bg-bg px-4 text-text">
+      <div className="w-[380px] rounded-xl border border-border bg-surface p-8">
+        <div className="mb-8 flex items-center justify-between">
+          <div className="flex items-center gap-2.5">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-amber/10">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FF6A2E" strokeWidth="1.8" strokeLinecap="round">
+                <rect x="4" y="7" width="16" height="12" rx="2" />
+                <path d="M8 7V5m8 2V5M9 12h.01M15 12h.01M9 16h6" />
+              </svg>
+            </div>
+            <div className="text-[15px] font-semibold tracking-tight text-text">Zora Bridge</div>
+          </div>
+          <StatusPulse />
+        </div>
 
-        <SignalBars />
-
-        <div className="mb-7 mt-5 text-center">
-          <div className="text-[16px] font-bold tracking-wide text-text">ZORA</div>
-          <div className="font-mono text-[9.5px] tracking-[0.2em] text-text-dim">BRIDGE</div>
-          <p className="mt-3 text-[12.5px] leading-relaxed text-text-secondary">
-            Masuk untuk mengelola agent, device, dan percakapan.
+        <div className="mb-7">
+          <h1 className="text-[19px] font-semibold text-text">Masuk ke dashboard</h1>
+          <p className="mt-1.5 text-[13px] leading-relaxed text-text-secondary">
+            Kelola agent, device, dan percakapan dari satu tempat.
           </p>
         </div>
 
@@ -97,11 +73,11 @@ export function LoginForm() {
               autoComplete="username"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full border border-border bg-surface-alt px-3 py-2 text-sm text-text outline-none focus:border-amber"
+              className="w-full rounded-lg border border-border bg-surface-alt px-3.5 py-2.5 text-sm text-text outline-none focus:border-amber"
             />
           </div>
 
-          <div className="mb-5">
+          <div className="mb-6">
             <FieldLabel htmlFor="login-password">Kata sandi</FieldLabel>
             <input
               id="login-password"
@@ -110,15 +86,12 @@ export function LoginForm() {
               autoComplete="current-password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full border border-border bg-surface-alt px-3 py-2 text-sm text-text outline-none focus:border-amber"
+              className="w-full rounded-lg border border-border bg-surface-alt px-3.5 py-2.5 text-sm text-text outline-none focus:border-amber"
             />
           </div>
 
           {error && (
-            <div
-              role="alert"
-              className="mb-5 border border-danger/40 bg-danger/10 px-3 py-2 text-[12px] text-danger"
-            >
+            <div role="alert" className="mb-6 rounded-lg border border-danger/30 bg-danger/10 px-3.5 py-2.5 text-[12.5px] text-danger">
               {error}
             </div>
           )}
@@ -126,11 +99,8 @@ export function LoginForm() {
           <button
             type="submit"
             disabled={loading}
-            className="flex w-full items-center justify-center gap-2 bg-amber px-3 py-2.5 text-sm font-semibold text-bg transition-colors hover:bg-amber-light disabled:cursor-not-allowed disabled:opacity-60"
+            className="flex w-full items-center justify-center gap-2 rounded-lg bg-amber px-3 py-2.5 text-sm font-semibold text-bg transition-colors hover:bg-amber-light disabled:cursor-not-allowed disabled:opacity-60"
           >
-            {loading && (
-              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-bg" aria-hidden="true" />
-            )}
             {loading ? "Menghubungkan..." : "Masuk"}
           </button>
         </form>

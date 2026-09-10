@@ -26,13 +26,13 @@ export default function LiveMonitor() {
       <div className="flex items-center justify-between">
         <h1 className="text-lg font-semibold text-text">Live Monitor</h1>
         <span
-          className={`rounded border px-2 py-1 text-[11px] font-semibold ${STATUS_CLASS[status]}`}
+          className={`rounded-full border px-2.5 py-1 text-[11px] font-semibold ${STATUS_CLASS[status]}`}
         >
           {STATUS_LABEL[status]}
         </span>
       </div>
 
-      <div className="rounded-md border border-amber/30 bg-amber/10 p-4 text-[12px] text-text">
+      <div className="rounded-xl border border-amber/30 bg-amber/10 p-4 text-[12px] text-text">
         <p className="font-semibold text-amber">Keterbatasan saat ini</p>
         <p className="mt-1 text-text-dim">
           Live monitor sudah terhubung ke server lewat WebSocket dan akan menampilkan event apa
@@ -46,7 +46,7 @@ export default function LiveMonitor() {
         </p>
       </div>
 
-      <div className="rounded-md border border-border bg-surface">
+      <div className="rounded-xl border border-border bg-surface">
         <div className="border-b border-border px-4 py-2 text-[11px] font-medium uppercase text-text-dim">
           Log Event Mentah ({events.length})
         </div>
@@ -64,7 +64,7 @@ export default function LiveMonitor() {
             >
               <div className="flex items-center gap-2 text-text-dim">
                 <span>{formatTime(ev.receivedAt)}</span>
-                <span className="rounded bg-surface-alt px-1.5 py-0.5 text-text">{ev.topic}</span>
+                <span className="rounded-md bg-surface-alt px-1.5 py-0.5 text-text">{ev.topic}</span>
               </div>
               <pre className="mt-1 whitespace-pre-wrap break-all text-text-dim">
                 {JSON.stringify(ev.payload, null, 2)}

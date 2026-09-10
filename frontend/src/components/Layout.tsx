@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from "react";
 import { NavLink, Outlet, useLocation } from "react-router-dom";
 import {
   LayoutGrid,
@@ -7,15 +8,17 @@ import {
   Activity,
   MessageSquare,
   Users,
+  ChevronDown,
+  LogOut,
 } from "lucide-react";
-import { getToken } from "../api/client";
+import { getToken, logout } from "../api/client";
 import { useHealth, useMe } from "../api/hooks";
 import { LoginForm } from "./LoginForm";
 
 interface NavItem {
   to: string;
   label: string;
-  icon: React.ComponentType<{ size?: number; strokeWidth?: number }>;
+  icon: React.ComponentType<{ size?: number; strokeWidth?: number; className?: string }>;
   badge?: string;
 }
 
@@ -26,7 +29,7 @@ interface NavGroup {
 
 const NAV_GROUPS: NavGroup[] = [
   {
-    label: "INTI",
+    label: "Inti",
     items: [
       { to: "/", label: "Overview", icon: LayoutGrid },
       { to: "/agents", label: "Agents", icon: Sparkles },
@@ -35,14 +38,14 @@ const NAV_GROUPS: NavGroup[] = [
     ],
   },
   {
-    label: "PANTAU",
+    label: "Pantau",
     items: [
       { to: "/live-monitor", label: "Live Monitor", icon: Activity },
       { to: "/conversations", label: "Percakapan", icon: MessageSquare },
     ],
   },
   {
-    label: "AKUN",
+    label: "Akun",
     items: [
       { to: "/users-roles", label: "Users & Roles", icon: Users, badge: "F3" },
     ],
@@ -59,9 +62,21 @@ const PAGE_META: Record<string, { title: string; subtitle: string }> = {
   "/users-roles": { title: "Users & Roles", subtitle: "Kelola akses tim (Fase 3)" },
 };
 
-function AccountFooter() {
+function AccountMenu() {
   const { data: me, isLoading: meLoading } = useMe();
   const { data: health } = useHealth();
+  const [open, setOpen] = useState(false);
+  const rootRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function onClickOutside(e: MouseEvent) {
+      if (rootRef.current && !rootRef.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", onClickOutside);
+    return () => document.removeEventListener("mousedown", onClickOutside);
+  }, []);
 
   const email = meLoading ? "" : (me?.email ?? "?");
   const initial = email ? email[0].toUpperCase() : "?";
@@ -69,72 +84,85 @@ function AccountFooter() {
     health === undefined ? "cek..." : health.database === "ok" ? "postgres ok" : "postgres down";
 
   return (
-    <div className="flex flex-col gap-1.5 border-t border-border px-[18px] py-3.5">
-      <div className="flex items-center gap-2">
-        <div className="flex h-6 w-6 items-center justify-center rounded-[2px] bg-[#3A342A] text-[11px] font-bold text-amber">
+    <div ref={rootRef} className="relative">
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        className="flex items-center gap-3 rounded-lg px-2 py-1.5 hover:bg-surface"
+      >
+        <div className="text-right">
+          <div className="text-[12.5px] font-medium text-text">{email || "Memuat..."}</div>
+          <div className={`font-mono text-[10px] ${health?.database === "down" ? "text-danger" : "text-text-dim"}`}>
+            {dbLabel}
+          </div>
+        </div>
+        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-amber/15 text-[12px] font-bold text-amber">
           {initial}
         </div>
-        <div className="overflow-hidden text-ellipsis whitespace-nowrap text-[11.5px] text-text-secondary">
-          {email || "Memuat..."}
+        <ChevronDown size={14} strokeWidth={2} className="text-text-dim" />
+      </button>
+
+      {open && (
+        <div className="absolute right-0 top-[calc(100%+6px)] w-44 overflow-hidden rounded-lg border border-border bg-surface py-1 shadow-lg">
+          <button
+            type="button"
+            onClick={logout}
+            className="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px] text-text-secondary hover:bg-surface-alt hover:text-danger"
+          >
+            <LogOut size={15} strokeWidth={1.8} />
+            Keluar
+          </button>
         </div>
-      </div>
-      <div
-        className={`font-mono text-[9.5px] ${health?.database === "down" ? "text-danger" : "text-[#56534D]"}`}
-      >
-        v0.1.0-dev &middot; {dbLabel}
-      </div>
+      )}
     </div>
   );
 }
 
 function Sidebar() {
   return (
-    <div className="flex w-56 shrink-0 flex-col border-r border-border bg-surface-alt">
-      <div className="flex items-center gap-2 px-[18px] pb-[18px] pt-5">
+    <div className="flex w-60 shrink-0 flex-col border-r border-border bg-surface-alt">
+      <div className="flex items-center gap-2.5 px-4 pb-5 pt-5">
         <svg
           width="22"
           height="22"
           viewBox="0 0 24 24"
           fill="none"
-          stroke="#E8A33D"
-          strokeWidth="1.7"
+          stroke="#FF6A2E"
+          strokeWidth="1.8"
           strokeLinecap="round"
         >
           <rect x="4" y="7" width="16" height="12" rx="2" />
           <path d="M8 7V5m8 2V5M9 12h.01M15 12h.01M9 16h6" />
         </svg>
-        <div>
-          <div className="text-[15px] font-bold tracking-wide">ZORA</div>
-          <div className="font-mono text-[9.5px] tracking-widest text-text-dim">
-            BRIDGE
-          </div>
-        </div>
+        <div className="text-[15px] font-semibold tracking-tight">Zora Bridge</div>
       </div>
 
       {NAV_GROUPS.map((group) => (
-        <div key={group.label}>
-          <div className="px-[18px] pb-1.5 pt-4 text-[10.5px] font-semibold tracking-[0.12em] text-text-dim">
-            {group.label}
-          </div>
+        <div key={group.label} className="px-3">
+          <div className="px-2 pb-1.5 pt-4 text-[11px] text-text-dim">{group.label}</div>
           {group.items.map((item) => (
             <NavLink
               key={item.to}
               to={item.to}
               end={item.to === "/"}
               className={({ isActive }) =>
-                `flex items-center gap-2.5 border-l-[3px] px-[18px] py-2 pl-[15px] text-[13.5px] font-medium ${
+                `flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-[13.5px] font-medium ${
                   isActive
-                    ? "border-amber bg-[#221F1B] text-text"
-                    : "border-transparent text-text-secondary hover:text-text"
+                    ? "bg-surface text-text"
+                    : "text-text-secondary hover:bg-surface hover:text-text"
                 }`
               }
             >
-              <item.icon size={17} strokeWidth={1.7} />
-              <span className="grow">{item.label}</span>
-              {item.badge && (
-                <span className="rounded-[2px] border border-[#35322C] font-mono text-[8.5px] text-text-dim px-1 py-0.5">
-                  {item.badge}
-                </span>
+              {({ isActive }) => (
+                <>
+                  <item.icon size={17} strokeWidth={1.7} className={isActive ? "text-amber" : ""} />
+                  <span className="grow">{item.label}</span>
+                  {item.badge && (
+                    <span className="rounded-md border border-border font-mono text-[8.5px] text-text-dim px-1 py-0.5">
+                      {item.badge}
+                    </span>
+                  )}
+                </>
               )}
             </NavLink>
           ))}
@@ -142,8 +170,6 @@ function Sidebar() {
       ))}
 
       <div className="grow" />
-
-      <AccountFooter />
     </div>
   );
 }
@@ -152,11 +178,12 @@ function Topbar() {
   const location = useLocation();
   const meta = PAGE_META[location.pathname] ?? { title: "Zora Bridge", subtitle: "" };
   return (
-    <div className="flex h-[60px] shrink-0 items-center justify-between border-b border-border px-7">
+    <div className="flex h-16 shrink-0 items-center justify-between border-b border-border px-7">
       <div className="flex flex-col gap-0.5">
         <div className="text-[17px] font-semibold tracking-tight">{meta.title}</div>
         <div className="text-[11.5px] text-text-dim">{meta.subtitle}</div>
       </div>
+      <AccountMenu />
     </div>
   );
 }

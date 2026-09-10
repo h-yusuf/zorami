@@ -138,7 +138,7 @@ export default function Agents() {
         <h1 className="text-lg font-semibold text-text">Agents</h1>
         <button
           onClick={startCreate}
-          className="rounded-md bg-amber px-3 py-1.5 text-[12px] font-semibold text-bg hover:bg-amber-light"
+          className="rounded-lg bg-amber px-3 py-1.5 text-[12px] font-semibold text-bg hover:bg-amber-light"
         >
           + Agent Baru
         </button>
@@ -146,7 +146,7 @@ export default function Agents() {
 
       <div className="flex gap-4">
         {/* List */}
-        <div className="w-64 shrink-0 rounded-md border border-border bg-surface">
+        <div className="w-64 shrink-0 rounded-xl border border-border bg-surface">
           {isLoading && <p className="p-4 text-[12px] text-text-dim">Memuat...</p>}
           {isError && <p className="p-4 text-[12px] text-danger">Gagal memuat agent.</p>}
           {agents && agents.length === 0 && (
@@ -174,7 +174,7 @@ export default function Agents() {
         </div>
 
         {/* Editor */}
-        <div className="flex-1 rounded-md border border-border bg-surface p-5">
+        <div className="flex-1 rounded-xl border border-border bg-surface p-5">
           {!showEditor && (
             <p className="text-[12px] text-text-dim">
               Pilih agent di sebelah kiri, atau buat agent baru.
@@ -191,7 +191,7 @@ export default function Agents() {
                   <input
                     value={form.name}
                     onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
-                    className="rounded border border-border bg-bg px-3 py-2 text-[13px] text-text"
+                    className="rounded-lg border border-border bg-bg px-3 py-2 text-[13px] text-text"
                   />
                 </label>
                 <label className="flex flex-col gap-1">
@@ -209,7 +209,7 @@ export default function Agents() {
                       setForm((f) => ({ ...f, system_prompt: e.target.value }))
                     }
                     rows={5}
-                    className="rounded border border-border bg-bg px-3 py-2 text-[13px] text-text"
+                    className="rounded-lg border border-border bg-bg px-3 py-2 text-[13px] text-text"
                   />
                 </label>
               </section>
@@ -227,7 +227,7 @@ export default function Agents() {
                       onChange={(e) =>
                         setForm((f) => ({ ...f, tts_provider: e.target.value }))
                       }
-                      className="rounded border border-border bg-bg px-3 py-2 text-[13px] text-text"
+                      className="rounded-lg border border-border bg-bg px-3 py-2 text-[13px] text-text"
                     />
                   </label>
                   <label className="flex flex-col gap-1">
@@ -237,7 +237,7 @@ export default function Agents() {
                     <input
                       value={form.tts_voice}
                       onChange={(e) => setForm((f) => ({ ...f, tts_voice: e.target.value }))}
-                      className="rounded border border-border bg-bg px-3 py-2 text-[13px] text-text"
+                      className="rounded-lg border border-border bg-bg px-3 py-2 text-[13px] text-text"
                     />
                   </label>
                   <label className="flex flex-col gap-1">
@@ -249,7 +249,7 @@ export default function Agents() {
                       onChange={(e) =>
                         setForm((f) => ({ ...f, emotion_level: e.target.value }))
                       }
-                      className="rounded border border-border bg-bg px-3 py-2 text-[13px] text-text"
+                      className="rounded-lg border border-border bg-bg px-3 py-2 text-[13px] text-text"
                     >
                       {EMOTION_OPTIONS.map((opt) => (
                         <option key={opt.value} value={opt.value}>
@@ -274,7 +274,7 @@ export default function Agents() {
                       onChange={(e) =>
                         setForm((f) => ({ ...f, llm_model: e.target.value }))
                       }
-                      className="rounded border border-border bg-bg px-3 py-2 text-[13px] text-text"
+                      className="rounded-lg border border-border bg-bg px-3 py-2 text-[13px] text-text"
                     />
                   </label>
                   <label className="flex flex-col gap-1">
@@ -290,7 +290,7 @@ export default function Agents() {
                       onChange={(e) =>
                         setForm((f) => ({ ...f, temperature: Number(e.target.value) }))
                       }
-                      className="rounded border border-border bg-bg px-3 py-2 text-[13px] text-text"
+                      className="rounded-lg border border-border bg-bg px-3 py-2 text-[13px] text-text"
                     />
                   </label>
                   <label className="flex flex-col gap-1">
@@ -304,7 +304,7 @@ export default function Agents() {
                       onChange={(e) =>
                         setForm((f) => ({ ...f, max_tokens: Number(e.target.value) }))
                       }
-                      className="rounded border border-border bg-bg px-3 py-2 text-[13px] text-text"
+                      className="rounded-lg border border-border bg-bg px-3 py-2 text-[13px] text-text"
                     />
                   </label>
                 </div>
@@ -359,7 +359,7 @@ export default function Agents() {
                     onChange={(e) =>
                       setForm((f) => ({ ...f, chat_log_level: Number(e.target.value) }))
                     }
-                    className="rounded border border-border bg-bg px-3 py-2 text-[13px] text-text"
+                    className="rounded-lg border border-border bg-bg px-3 py-2 text-[13px] text-text"
                   >
                     {CHAT_LOG_OPTIONS.map((opt) => (
                       <option key={opt.value} value={opt.value}>
@@ -374,7 +374,7 @@ export default function Agents() {
                 <button
                   onClick={handleSave}
                   disabled={isSaving || !form.name}
-                  className="rounded-md bg-amber px-4 py-2 text-[12px] font-semibold text-bg hover:bg-amber-light disabled:opacity-50"
+                  className="rounded-lg bg-amber px-4 py-2 text-[12px] font-semibold text-bg hover:bg-amber-light disabled:opacity-50"
                 >
                   {isCreating ? "Buat Agent" : "Simpan Perubahan"}
                 </button>
@@ -382,7 +382,7 @@ export default function Agents() {
                   <button
                     onClick={handleDelete}
                     disabled={deleteAgent.isPending}
-                    className="rounded-md border border-danger px-4 py-2 text-[12px] font-semibold text-danger hover:bg-danger/10 disabled:opacity-50"
+                    className="rounded-lg border border-danger px-4 py-2 text-[12px] font-semibold text-danger hover:bg-danger/10 disabled:opacity-50"
                   >
                     Hapus Agent
                   </button>

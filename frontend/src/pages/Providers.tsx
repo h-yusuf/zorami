@@ -122,7 +122,7 @@ export default function Providers() {
         <h1 className="text-lg font-semibold text-text">Providers & Keys</h1>
         <button
           onClick={startCreate}
-          className="rounded-md bg-amber px-3 py-1.5 text-[12px] font-semibold text-bg hover:bg-amber-light"
+          className="rounded-lg bg-amber px-3 py-1.5 text-[12px] font-semibold text-bg hover:bg-amber-light"
         >
           + Provider Baru
         </button>
@@ -132,7 +132,7 @@ export default function Providers() {
       {isError && <p className="text-[12px] text-danger">Gagal memuat providers.</p>}
 
       {showForm && (
-        <div className="rounded-md border border-border bg-surface p-5">
+        <div className="rounded-xl border border-border bg-surface p-5">
           <h2 className="mb-3 text-[13px] font-semibold text-text">Tambah Provider</h2>
           <div className="grid grid-cols-2 gap-3">
             <label className="flex flex-col gap-1">
@@ -140,7 +140,7 @@ export default function Providers() {
               <select
                 value={form.kind}
                 onChange={(e) => setForm((f) => ({ ...f, kind: e.target.value, fallback_of: "" }))}
-                className="rounded border border-border bg-bg px-3 py-2 text-[13px] text-text"
+                className="rounded-lg border border-border bg-bg px-3 py-2 text-[13px] text-text"
               >
                 {KIND_OPTIONS.map((opt) => (
                   <option key={opt.value} value={opt.value}>
@@ -157,7 +157,7 @@ export default function Providers() {
                 value={form.provider_code}
                 onChange={(e) => setForm((f) => ({ ...f, provider_code: e.target.value }))}
                 placeholder="omnirouter, groq, piper, searxng..."
-                className="rounded border border-border bg-bg px-3 py-2 text-[13px] text-text"
+                className="rounded-lg border border-border bg-bg px-3 py-2 text-[13px] text-text"
               />
             </label>
             <label className="col-span-2 flex flex-col gap-1">
@@ -168,7 +168,7 @@ export default function Providers() {
                 value={form.configText}
                 onChange={(e) => setForm((f) => ({ ...f, configText: e.target.value }))}
                 rows={4}
-                className="rounded border border-border bg-bg px-3 py-2 font-mono text-[12px] text-text"
+                className="rounded-lg border border-border bg-bg px-3 py-2 font-mono text-[12px] text-text"
               />
               {configError && <span className="text-[11px] text-danger">{configError}</span>}
             </label>
@@ -180,7 +180,7 @@ export default function Providers() {
                 type="password"
                 value={form.secret}
                 onChange={(e) => setForm((f) => ({ ...f, secret: e.target.value }))}
-                className="rounded border border-border bg-bg px-3 py-2 text-[13px] text-text"
+                className="rounded-lg border border-border bg-bg px-3 py-2 text-[13px] text-text"
               />
             </label>
             <label className="flex flex-col gap-1">
@@ -190,7 +190,7 @@ export default function Providers() {
               <select
                 value={form.fallback_of}
                 onChange={(e) => setForm((f) => ({ ...f, fallback_of: e.target.value }))}
-                className="rounded border border-border bg-bg px-3 py-2 text-[13px] text-text"
+                className="rounded-lg border border-border bg-bg px-3 py-2 text-[13px] text-text"
               >
                 <option value="">— Tidak ada —</option>
                 {fallbackCandidates.map((p) => (
@@ -205,7 +205,7 @@ export default function Providers() {
             <button
               onClick={handleCreate}
               disabled={createProvider.isPending || !form.provider_code || !form.secret}
-              className="rounded-md bg-amber px-4 py-2 text-[12px] font-semibold text-bg hover:bg-amber-light disabled:opacity-50"
+              className="rounded-lg bg-amber px-4 py-2 text-[12px] font-semibold text-bg hover:bg-amber-light disabled:opacity-50"
             >
               Simpan Provider
             </button>
@@ -270,7 +270,7 @@ function ProviderKindColumn({
   testPending: boolean;
 }) {
   return (
-    <div className="rounded-md border border-border bg-surface p-4">
+    <div className="rounded-xl border border-border bg-surface p-4">
       <h2 className="mb-3 text-[13px] font-semibold uppercase text-text">{title}</h2>
       <div className="flex flex-col gap-3">
         {providers.map((p) => {
@@ -278,11 +278,11 @@ function ProviderKindColumn({
           const fallbackTarget = allProviders.find((f) => f.id === p.fallback_of);
           const result = testResults[p.id];
           return (
-            <div key={p.id} className="rounded border border-border bg-bg p-3">
+            <div key={p.id} className="rounded-lg border border-border bg-bg p-3">
               <div className="flex items-center justify-between">
                 <span className="text-[13px] font-medium text-text">{p.provider_code}</span>
                 <span
-                  className={`rounded border px-1.5 py-0.5 text-[10px] font-semibold ${badge.className}`}
+                  className={`rounded-full border px-2 py-0.5 text-[10px] font-semibold ${badge.className}`}
                 >
                   {badge.label}
                 </span>
@@ -306,13 +306,13 @@ function ProviderKindColumn({
                 <button
                   onClick={() => onTest(p.id)}
                   disabled={testPending}
-                  className="rounded border border-border px-2 py-1 text-[11px] font-semibold text-text-secondary hover:bg-surface-alt disabled:opacity-50"
+                  className="rounded-lg border border-border px-2 py-1 text-[11px] font-semibold text-text-secondary hover:bg-surface-alt disabled:opacity-50"
                 >
                   Tes Koneksi
                 </button>
                 <button
                   onClick={() => onDelete(p.id)}
-                  className="rounded border border-danger px-2 py-1 text-[11px] font-semibold text-danger hover:bg-danger/10"
+                  className="rounded-lg border border-danger px-2 py-1 text-[11px] font-semibold text-danger hover:bg-danger/10"
                 >
                   Hapus
                 </button>
