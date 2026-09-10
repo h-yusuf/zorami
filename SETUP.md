@@ -110,6 +110,8 @@ Jalankan test suite backend:
 uv run pytest -v
 ```
 
+**Penting**: test suite otomatis pakai database terpisah (`<nama_db_di_env>_test`, contoh `zora_bridge_test`), dibuat otomatis kalau belum ada — **bukan** database yang sama dengan yang kamu pakai buat dev/Docker manual (`zora_bridge`). Ini sengaja: tiap test menghapus semua baris tabel domain (`_clean_db` di `tests/conftest.py`) supaya state selalu bersih, dan sebelum ada pemisahan ini, menjalankan `pytest` ikut menghapus data yang di-seed manual di dashboard. Data hasil klik-klik manual di dashboard/Docker kamu **aman** dari `pytest` sekarang, gak peduli berapa kali dijalankan.
+
 ---
 
 ## 5. Bikin akun buat login dashboard
