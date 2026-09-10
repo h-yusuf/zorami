@@ -1,27 +1,27 @@
 import { useQuery } from "@tanstack/react-query";
 import { apiJson } from "./client";
 
+export interface OverviewProvider {
+  kind: string;
+  provider_code: string;
+  p50_ms: number;
+}
+
+export interface OverviewAttentionItem {
+  type: string;
+  message: string;
+  device_id?: string;
+}
+
 export interface OverviewData {
-  devices_active: number;
+  devices_online: number;
   devices_total: number;
   turns_today: number;
-  latency_p50_ms: number;
-  turns_failed: number;
-  pipeline: Array<{
-    stage: string;
-    provider: string;
-    latency_p50_ms: number;
-    quota_status: string;
-  }>;
-  devices: Array<{
-    id: string;
-    name: string;
-    status: string;
-    wifi_strength: number;
-    battery: number;
-    agent_name: string | null;
-  }>;
-  attention: Array<{ message: string; severity: string }>;
+  p50_latency_ms: number;
+  active_conversations: number;
+  agents_total: number;
+  providers: OverviewProvider[];
+  needs_attention: OverviewAttentionItem[];
 }
 
 export function useOverview() {
