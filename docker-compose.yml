@@ -15,5 +15,24 @@ services:
       timeout: 5s
       retries: 5
 
+  # Opsional - dev sehari-hari masih `uv run uvicorn ...` di host (hot-reload,
+  # akses langsung ke uv/venv). Service ini buat nyoba jalan penuh lewat Docker,
+  # atau nanti buat deployment. Jalankan eksplisit dengan --profile app:
+  #   docker compose --profile app up -d
+  app:
+    profiles: ["app"]
+    build: .
+    env_file:
+      - .env
+    environment:
+      # Di dalam jaringan compose, host Postgres adalah nama service "postgres",
+      # bukan "localhost" - override apa pun yang ada di .env.
+      ZORA_DATABASE_URL: postgresql+asyncpg://zora:zora_dev_only@postgres:5432/zora_bridge
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
 volumes:
   pgdata:

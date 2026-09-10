@@ -2,7 +2,7 @@
 
 Backend self-host untuk device voice ESP32 (Zora Mini). Ganti cloud `xiaozhi.me` dengan server sendiri — voice loop dua arah, websearch kondisional, LLM/TTS/STT pakai token milik user sendiri (BYOK).
 
-**Status: desain selesai, belum ada kode.**
+**Status: Fase 1 (voice loop inti) selesai & teruji.** Fase 2 (dashboard) dan Fase 3 (RBAC) baru sebatas plan.
 
 ---
 
@@ -15,6 +15,31 @@ Device (Opus via WebSocket) → Bridge → VAD sisi server → STT → Search? �
 ```
 
 Target: p50 mulut-ke-telinga di bawah 2.5 detik.
+
+---
+
+## Cara menjalankan
+
+### Dev lokal (dipakai sekarang)
+
+```bash
+cp .env.example .env          # isi key provider sesuai kebutuhan - lihat komentar di file
+docker compose up -d postgres # Postgres jalan di Docker, app tetap di host
+uv sync                       # install dependency (sekali, atau tiap pyproject berubah)
+uv run alembic upgrade head   # terapkan migrasi skema
+uv run uvicorn app.main:app --reload --port 8000
+uv run pytest -v              # jalankan test suite
+```
+
+Tanpa key provider (STT/LLM/TTS/search) diisi, server tetap jalan dan handshake/OTA tetap berfungsi — cuma voice loop yang gagal di turn tersebut (koneksi tidak crash, device diminta coba lagi, sudah diverifikasi manual).
+
+### Docker (opsional — buat nyoba full container atau deployment nanti)
+
+```bash
+docker compose --profile app up -d --build
+```
+
+Menjalankan Postgres **dan** app dalam satu jaringan compose (app otomatis diarahkan ke `postgres:5432`, bukan `localhost`). `.env` tetap dipakai buat key provider lewat `env_file`. Profile `app` sengaja dipisah dari default supaya `docker compose up -d postgres` di alur dev lokal di atas tidak ikut membangun image app tiap kali.
 
 ---
 
