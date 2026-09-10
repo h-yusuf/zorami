@@ -14,7 +14,7 @@ class Settings(BaseSettings):
     groq_api_key: str = ""
     piper_binary_path: str = "/usr/local/bin/piper"
     piper_model_path: str = "/models/id_ID-news-medium.onnx"
-    searxng_base_url: str = "http://localhost:8888"
+    langsearch_api_key: str = ""
 
 
 settings = Settings()

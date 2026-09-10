@@ -25,6 +25,12 @@ class OmnirouterAdapter:
             "messages": messages,
             "max_tokens": max_tokens,
             "temperature": temperature,
+            # WAJIB eksplisit - beberapa endpoint OpenAI-compatible (termasuk
+            # omnirouter multi-provider) default ke SSE streaming kalau field ini
+            # tidak ada sama sekali, bukan default ke non-streaming seperti spec
+            # OpenAI resmi. Tanpa ini, respons berupa baris "data: {...}" yang
+            # bukan JSON tunggal - resp.json() akan gagal parse.
+            "stream": False,
         }
         if tools:
             payload["tools"] = tools

@@ -27,7 +27,7 @@ _FRAME_DURATION_S = 0.06
 def _build_pipeline(mcp: McpClient) -> Pipeline:
     # Fase 1: satu konfigurasi hardcoded. Fase 2 mengambil per-agent dari DB.
     from app.adapters.llm.omnirouter import OmnirouterAdapter
-    from app.adapters.search.searxng import SearxngAdapter
+    from app.adapters.search.langsearch import LangSearchAdapter
     from app.adapters.stt.groq_whisper import GroqWhisperAdapter
     from app.adapters.tts.piper import PiperAdapter
     from app.config import settings
@@ -45,7 +45,7 @@ def _build_pipeline(mcp: McpClient) -> Pipeline:
             "Kamu Zora, asisten suara berbahasa Indonesia. Jawab singkat, "
             "maksimal dua kalimat, tanpa markdown."
         ),
-        search=SearxngAdapter(base_url=settings.searxng_base_url),
+        search=LangSearchAdapter(api_key=settings.langsearch_api_key),
         mcp=mcp,
     )
 
