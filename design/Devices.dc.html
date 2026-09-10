@@ -1,0 +1,245 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+  <style>
+    body { margin: 0; background: #171614; color: #F2EFE8; font-family: 'Archivo', system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+    a { color: #E8A33D; text-decoration: none; }
+    a:hover { color: #F2BE68; }
+    .mono { font-family: 'IBM Plex Mono', ui-monospace, monospace; }
+    .nav { display: flex; align-items: center; gap: 10px; padding: 8px 18px 8px 15px; border-left: 3px solid transparent; color: #A8A29A; font-size: 13.5px; font-weight: 500; }
+    .nav.on { border-left-color: #E8A33D; color: #F2EFE8; background: #221F1B; }
+    .grp { padding: 16px 18px 6px; font-size: 10.5px; letter-spacing: 0.12em; color: #6E6A63; font-weight: 600; }
+    .card { background: #1F1E1B; border: 1px solid #302D28; border-radius: 3px; }
+    .lbl { font-size: 10.5px; letter-spacing: 0.1em; color: #6E6A63; font-weight: 600; text-transform: uppercase; }
+    .hint { font-size: 11.5px; color: #6E6A63; line-height: 1.5; }
+    .th { font-size: 10px; letter-spacing: 0.1em; color: #6E6A63; font-weight: 600; text-transform: uppercase; padding: 9px 14px; }
+    .td { padding: 12px 14px; font-size: 12.5px; }
+    .act { display: flex; align-items: center; gap: 9px; border: 1px solid #35322C; border-radius: 3px; padding: 9px 11px; font-size: 12.5px; color: #D6D1C8; }
+  </style>
+</helmet>
+
+<div style="display: flex; width: 1440px; height: 980px; overflow: hidden">
+
+  <!-- sidebar -->
+  <div style="width: 224px; flex-shrink: 0; background: #1B1A17; border-right: 1px solid #302D28; display: flex; flex-direction: column">
+    <div style="display: flex; align-items: center; gap: 9px; padding: 20px 18px 18px">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#E8A33D" stroke-width="1.7" stroke-linecap="round"><rect x="4" y="7" width="16" height="12" rx="2"></rect><path d="M8 7V5m8 2V5M9 12h.01M15 12h.01M9 16h6"></path></svg>
+      <div>
+        <div style="font-size: 15px; font-weight: 700; letter-spacing: 0.04em">ZORA</div>
+        <div class="mono" style="font-size: 9.5px; color: #6E6A63; letter-spacing: 0.1em">BRIDGE</div>
+      </div>
+    </div>
+    <div class="grp">INTI</div>
+    <div class="nav">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="3" width="7" height="7" rx="1"></rect><rect x="14" y="3" width="7" height="7" rx="1"></rect><rect x="3" y="14" width="7" height="7" rx="1"></rect><rect x="14" y="14" width="7" height="7" rx="1"></rect></svg>
+      Overview
+    </div>
+    <div class="nav">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M12 3v3m0 12v3M5.6 5.6l2.1 2.1m8.6 8.6 2.1 2.1M3 12h3m12 0h3M5.6 18.4l2.1-2.1m8.6-8.6 2.1-2.1"></path><circle cx="12" cy="12" r="3.2"></circle></svg>
+      Agents
+    </div>
+    <div class="nav on">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><rect x="6" y="6" width="12" height="12" rx="1.5"></rect><path d="M10 3v3m4-3v3m-4 12v3m4-3v3M3 10h3m-3 4h3m12-4h3m-3 4h3"></path></svg>
+      Devices
+    </div>
+    <div class="nav">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="8" cy="12" r="3.5"></circle><path d="M11.5 12H21m-4 0v3.5"></path></svg>
+      Providers &amp; Keys
+    </div>
+    <div class="grp">PANTAU</div>
+    <div class="nav">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M3 12h3.5l2-6 3 13 2.5-8 1.7 4H21"></path></svg>
+      Live Monitor
+    </div>
+    <div class="nav">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M20 15a2 2 0 0 1-2 2H8l-4 4V6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2z"></path></svg>
+      Percakapan
+    </div>
+    <div class="grp">AKUN</div>
+    <div class="nav">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="9" cy="8" r="3.2"></circle><path d="M3.5 19c0-3 2.5-5 5.5-5s5.5 2 5.5 5M16 5.5a3 3 0 0 1 0 5.6m1.5 2.9c2 .6 3.5 2.3 3.5 5"></path></svg>
+      <span style="flex-grow: 1">Users &amp; Roles</span>
+      <span class="mono" style="font-size: 8.5px; color: #6E6A63; border: 1px solid #35322C; padding: 1px 4px; border-radius: 2px">F3</span>
+    </div>
+    <div style="flex-grow: 1"></div>
+    <div style="border-top: 1px solid #302D28; padding: 14px 18px">
+      <div style="display: flex; align-items: center; gap: 8px">
+        <div style="width: 24px; height: 24px; border-radius: 2px; background: #3A342A; color: #E8A33D; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center">Y</div>
+        <div style="font-size: 11.5px; color: #A8A29A">yusuf@tspindonesia.com</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- main -->
+  <div style="flex-grow: 1; display: flex; flex-direction: column; overflow: hidden">
+    <div style="height: 60px; flex-shrink: 0; border-bottom: 1px solid #302D28; display: flex; align-items: center; justify-content: space-between; padding: 0 28px">
+      <div style="display: flex; flex-direction: column; gap: 2px">
+        <div style="font-size: 17px; font-weight: 600; letter-spacing: -0.01em">Devices</div>
+        <div style="font-size: 11.5px; color: #6E6A63">3 device terdaftar &middot; 2 online</div>
+      </div>
+      <div class="mono" style="font-size: 11px; color: #6E6A63; border: 1px solid #302D28; padding: 7px 10px; border-radius: 3px">FIRMWARE HOST: AKTIF</div>
+    </div>
+
+    <div style="padding: 20px 28px; display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr); gap: 18px; overflow: hidden">
+
+      <!-- kolom kiri -->
+      <div style="display: flex; flex-direction: column; gap: 16px">
+
+        <!-- pairing -->
+        <div class="card" style="padding: 0; border-color: #4A3A2A">
+          <div style="padding: 14px 18px; border-bottom: 1px solid #302D28; display: flex; align-items: center; gap: 9px">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#E8A33D" stroke-width="1.8" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg>
+            <div style="font-size: 13.5px; font-weight: 600">Pasangkan device baru</div>
+          </div>
+          <div style="padding: 16px 18px; display: flex; flex-direction: column; gap: 14px">
+            <div class="hint">Nyalakan device di WiFi yang sama. Setelah tersambung, layarnya menampilkan kode enam karakter. Masukkan kode itu di sini &mdash; device langsung menerima alamat bridge dan tokennya sendiri, tanpa perlu dicolok ke komputer.</div>
+            <div style="display: flex; align-items: center; gap: 10px">
+              <div style="display: flex; gap: 7px">
+                <div class="mono" style="width: 40px; height: 48px; background: #171614; border: 1px solid #4A3A2A; border-radius: 3px; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 600">4</div>
+                <div class="mono" style="width: 40px; height: 48px; background: #171614; border: 1px solid #4A3A2A; border-radius: 3px; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 600">K</div>
+                <div class="mono" style="width: 40px; height: 48px; background: #171614; border: 1px solid #4A3A2A; border-radius: 3px; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 600">9</div>
+                <div class="mono" style="width: 40px; height: 48px; background: #171614; border: 1px solid #4A3A2A; border-radius: 3px; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 600">T</div>
+                <div class="mono" style="width: 40px; height: 48px; background: #171614; border: 1px solid #E8A33D; border-radius: 3px; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 600; color: #E8A33D">2</div>
+                <div class="mono" style="width: 40px; height: 48px; background: #171614; border: 1px solid #35322C; border-radius: 3px"></div>
+              </div>
+              <div style="font-size: 12.5px; color: #171614; background: #E8A33D; padding: 10px 16px; border-radius: 3px; font-weight: 600">Klaim device</div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px; background: #1D1C19; border-radius: 3px; padding: 9px 12px">
+              <div style="width: 6px; height: 6px; border-radius: 50%; background: #E8A33D"></div>
+              <div class="mono" style="font-size: 11px; color: #C9B48C">1 device sedang menunggu diklaim &middot; A4:CF:12:9B:07:F3</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- tabel -->
+        <div class="card" style="padding: 0; display: flex; flex-direction: column">
+          <div style="display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1.1fr) 88px 96px; border-bottom: 1px solid #302D28">
+            <div class="th">Device</div>
+            <div class="th">Agent</div>
+            <div class="th">Firmware</div>
+            <div class="th">Status</div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1.1fr) 88px 96px; border-bottom: 1px solid #26241F; background: #221F1B; border-left: 3px solid #E8A33D">
+            <div class="td" style="display: flex; flex-direction: column; gap: 3px">
+              <div style="font-weight: 500">Zora Ruang Tamu</div>
+              <div class="mono" style="font-size: 10.5px; color: #6E6A63">A4:CF:12:9B:00:7E</div>
+            </div>
+            <div class="td" style="color: #D6D1C8">Zora Santai</div>
+            <div class="td mono" style="font-size: 11px; color: #8FD6BC">1.9.2</div>
+            <div class="td" style="display: flex; align-items: center; gap: 7px">
+              <div style="width: 6px; height: 6px; border-radius: 50%; background: #4FC3A1"></div>
+              <span style="color: #8FD6BC">Bicara</span>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1.1fr) 88px 96px; border-bottom: 1px solid #26241F; border-left: 3px solid transparent">
+            <div class="td" style="display: flex; flex-direction: column; gap: 3px">
+              <div style="font-weight: 500">Zora Meja Kerja</div>
+              <div class="mono" style="font-size: 10.5px; color: #6E6A63">A4:CF:12:9B:03:C1</div>
+            </div>
+            <div class="td" style="color: #D6D1C8">Asisten Kerja</div>
+            <div class="td mono" style="font-size: 11px; color: #E8A33D">1.8.7</div>
+            <div class="td" style="display: flex; align-items: center; gap: 7px">
+              <div style="width: 6px; height: 6px; border-radius: 50%; background: #4FC3A1"></div>
+              <span style="color: #A8A29A">Idle</span>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1.1fr) 88px 96px; border-left: 3px solid transparent">
+            <div class="td" style="display: flex; flex-direction: column; gap: 3px">
+              <div style="font-weight: 500; color: #A8A29A">Zora Kamar Anak</div>
+              <div class="mono" style="font-size: 10.5px; color: #56534D">A4:CF:12:9B:11:2A</div>
+            </div>
+            <div class="td" style="color: #8B857D">Zora Anak</div>
+            <div class="td mono" style="font-size: 11px; color: #6E6A63">1.9.2</div>
+            <div class="td" style="display: flex; align-items: center; gap: 7px">
+              <div style="width: 6px; height: 6px; border-radius: 50%; background: #56534D"></div>
+              <span style="color: #6E6A63">Offline</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- kolom kanan: detail -->
+      <div style="display: flex; flex-direction: column; gap: 16px">
+        <div class="card" style="padding: 16px 18px; display: flex; flex-direction: column; gap: 13px">
+          <div style="display: flex; flex-direction: column; gap: 3px">
+            <div style="font-size: 14px; font-weight: 600">Zora Ruang Tamu</div>
+            <div class="mono" style="font-size: 10.5px; color: #6E6A63">diklaim 12 Agu 2026</div>
+          </div>
+
+          <div style="height: 1px; background: #302D28"></div>
+
+          <div style="display: flex; flex-direction: column; gap: 9px">
+            <div style="display: flex; justify-content: space-between; align-items: center">
+              <div class="lbl">Agent</div>
+              <div style="font-size: 12.5px; color: #E8A33D; font-weight: 500">Zora Santai</div>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center">
+              <div class="lbl">Client-Id</div>
+              <div class="mono" style="font-size: 11px; color: #A8A29A">b7f1&hellip;9c02</div>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center">
+              <div class="lbl">Token device</div>
+              <div class="mono" style="font-size: 11px; color: #A8A29A">zb_&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;7e21</div>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center">
+              <div class="lbl">Uptime sesi</div>
+              <div class="mono" style="font-size: 11px; color: #A8A29A">3j 12m</div>
+            </div>
+          </div>
+
+          <div style="height: 1px; background: #302D28"></div>
+
+          <div style="display: flex; flex-direction: column; gap: 5px">
+            <div class="lbl">Tool device terdeteksi</div>
+            <div class="hint">Ditemukan otomatis lewat MCP saat device tersambung.</div>
+            <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px">
+              <span class="mono" style="font-size: 10px; color: #8FD6BC; background: #1F241F; border: 1px solid #2F4033; padding: 3px 6px; border-radius: 2px">self.audio_speaker.set_volume</span>
+              <span class="mono" style="font-size: 10px; color: #8FD6BC; background: #1F241F; border: 1px solid #2F4033; padding: 3px 6px; border-radius: 2px">self.screen.set_brightness</span>
+              <span class="mono" style="font-size: 10px; color: #8FD6BC; background: #1F241F; border: 1px solid #2F4033; padding: 3px 6px; border-radius: 2px">self.screen.set_theme</span>
+              <span class="mono" style="font-size: 10px; color: #8FD6BC; background: #1F241F; border: 1px solid #2F4033; padding: 3px 6px; border-radius: 2px">self.get_device_status</span>
+              <span class="mono" style="font-size: 10px; color: #C9B48C; background: #201C18; border: 1px solid #4A3A2A; padding: 3px 6px; border-radius: 2px">self.reboot &mdash; khusus dashboard</span>
+              <span class="mono" style="font-size: 10px; color: #C9B48C; background: #201C18; border: 1px solid #4A3A2A; padding: 3px 6px; border-radius: 2px">self.upgrade_firmware &mdash; khusus dashboard</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- tindakan -->
+        <div class="card" style="padding: 16px 18px; display: flex; flex-direction: column; gap: 11px">
+          <div style="font-size: 13.5px; font-weight: 600">Tindakan</div>
+          <div class="act">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#A8A29A" stroke-width="1.8" stroke-linecap="round"><path d="M12 3v3m0 12v3M5.6 5.6l2.1 2.1m8.6 8.6 2.1 2.1M3 12h3m12 0h3M5.6 18.4l2.1-2.1m8.6-8.6 2.1-2.1"></path></svg>
+            <span style="flex-grow: 1">Pindahkan ke agent lain</span>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#6E6A63" stroke-width="2" stroke-linecap="round"><path d="m9 6 6 6-6 6"></path></svg>
+          </div>
+          <div class="act">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#A8A29A" stroke-width="1.8" stroke-linecap="round"><path d="M12 16v-8m0 0-3.5 3.5M12 8l3.5 3.5M4 18v1.5A1.5 1.5 0 0 0 5.5 21h13a1.5 1.5 0 0 0 1.5-1.5V18"></path></svg>
+            <span style="flex-grow: 1; color: #8B857D">Kirim firmware</span>
+            <span class="mono" style="font-size: 10.5px; color: #4FC3A1">sudah 1.9.2</span>
+          </div>
+          <div class="act">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#A8A29A" stroke-width="1.8" stroke-linecap="round"><path d="M20.5 12a8.5 8.5 0 1 1-2.6-6.1M20.5 4v4.5H16"></path></svg>
+            <span style="flex-grow: 1">Reboot device</span>
+          </div>
+          <div class="act" style="border-color: #4A2E28">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#E4674F" stroke-width="1.8" stroke-linecap="round"><path d="M4 7h16M9 7V5h6v2m-8 0 1 13h8l1-13"></path></svg>
+            <span style="flex-grow: 1; color: #E4674F">Lepas dari akun</span>
+          </div>
+          <div class="hint">Melepas device menghapus token dan ikatannya ke agent. Riwayat percakapan tetap tersimpan.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

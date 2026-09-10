@@ -1,0 +1,254 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+  <style>
+    body { margin: 0; background: #171614; color: #F2EFE8; font-family: 'Archivo', system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+    a { color: #E8A33D; text-decoration: none; }
+    a:hover { color: #F2BE68; }
+    .mono { font-family: 'IBM Plex Mono', ui-monospace, monospace; }
+    .nav { display: flex; align-items: center; gap: 10px; padding: 8px 18px 8px 15px; border-left: 3px solid transparent; color: #A8A29A; font-size: 13.5px; font-weight: 500; }
+    .nav.on { border-left-color: #E8A33D; color: #F2EFE8; background: #221F1B; }
+    .grp { padding: 16px 18px 6px; font-size: 10.5px; letter-spacing: 0.12em; color: #6E6A63; font-weight: 600; }
+    .card { background: #1F1E1B; border: 1px solid #302D28; border-radius: 3px; }
+    .lbl { font-size: 10.5px; letter-spacing: 0.1em; color: #6E6A63; font-weight: 600; text-transform: uppercase; }
+    .field { background: #171614; border: 1px solid #35322C; border-radius: 3px; padding: 9px 11px; font-size: 13px; color: #F2EFE8; }
+    .hint { font-size: 11.5px; color: #6E6A63; line-height: 1.5; }
+    .btn { font-size: 12px; padding: 7px 12px; border-radius: 3px; border: 1px solid #35322C; color: #D6D1C8; font-weight: 500; }
+    .free { font-size: 9.5px; letter-spacing: 0.06em; font-weight: 600; color: #8FD6BC; background: #1F241F; border: 1px solid #2F4033; padding: 2px 6px; border-radius: 2px; }
+    .paid { font-size: 9.5px; letter-spacing: 0.06em; font-weight: 600; color: #C9B48C; background: #201C18; border: 1px solid #4A3A2A; padding: 2px 6px; border-radius: 2px; }
+  </style>
+</helmet>
+
+<div style="display: flex; width: 1440px; height: 980px; overflow: hidden">
+
+  <!-- sidebar -->
+  <div style="width: 224px; flex-shrink: 0; background: #1B1A17; border-right: 1px solid #302D28; display: flex; flex-direction: column">
+    <div style="display: flex; align-items: center; gap: 9px; padding: 20px 18px 18px">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#E8A33D" stroke-width="1.7" stroke-linecap="round"><rect x="4" y="7" width="16" height="12" rx="2"></rect><path d="M8 7V5m8 2V5M9 12h.01M15 12h.01M9 16h6"></path></svg>
+      <div>
+        <div style="font-size: 15px; font-weight: 700; letter-spacing: 0.04em">ZORA</div>
+        <div class="mono" style="font-size: 9.5px; color: #6E6A63; letter-spacing: 0.1em">BRIDGE</div>
+      </div>
+    </div>
+    <div class="grp">INTI</div>
+    <div class="nav">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="3" width="7" height="7" rx="1"></rect><rect x="14" y="3" width="7" height="7" rx="1"></rect><rect x="3" y="14" width="7" height="7" rx="1"></rect><rect x="14" y="14" width="7" height="7" rx="1"></rect></svg>
+      Overview
+    </div>
+    <div class="nav">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M12 3v3m0 12v3M5.6 5.6l2.1 2.1m8.6 8.6 2.1 2.1M3 12h3m12 0h3M5.6 18.4l2.1-2.1m8.6-8.6 2.1-2.1"></path><circle cx="12" cy="12" r="3.2"></circle></svg>
+      Agents
+    </div>
+    <div class="nav">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><rect x="6" y="6" width="12" height="12" rx="1.5"></rect><path d="M10 3v3m4-3v3m-4 12v3m4-3v3M3 10h3m-3 4h3m12-4h3m-3 4h3"></path></svg>
+      Devices
+    </div>
+    <div class="nav on">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="8" cy="12" r="3.5"></circle><path d="M11.5 12H21m-4 0v3.5"></path></svg>
+      Providers &amp; Keys
+    </div>
+    <div class="grp">PANTAU</div>
+    <div class="nav">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M3 12h3.5l2-6 3 13 2.5-8 1.7 4H21"></path></svg>
+      Live Monitor
+    </div>
+    <div class="nav">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M20 15a2 2 0 0 1-2 2H8l-4 4V6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2z"></path></svg>
+      Percakapan
+    </div>
+    <div class="grp">AKUN</div>
+    <div class="nav">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="9" cy="8" r="3.2"></circle><path d="M3.5 19c0-3 2.5-5 5.5-5s5.5 2 5.5 5M16 5.5a3 3 0 0 1 0 5.6m1.5 2.9c2 .6 3.5 2.3 3.5 5"></path></svg>
+      <span style="flex-grow: 1">Users &amp; Roles</span>
+      <span class="mono" style="font-size: 8.5px; color: #6E6A63; border: 1px solid #35322C; padding: 1px 4px; border-radius: 2px">F3</span>
+    </div>
+    <div style="flex-grow: 1"></div>
+    <div style="border-top: 1px solid #302D28; padding: 14px 18px">
+      <div style="display: flex; align-items: center; gap: 8px">
+        <div style="width: 24px; height: 24px; border-radius: 2px; background: #3A342A; color: #E8A33D; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center">Y</div>
+        <div style="font-size: 11.5px; color: #A8A29A">yusuf@tspindonesia.com</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- main -->
+  <div style="flex-grow: 1; display: flex; flex-direction: column; overflow: hidden">
+    <div style="height: 60px; flex-shrink: 0; border-bottom: 1px solid #302D28; display: flex; align-items: center; justify-content: space-between; padding: 0 28px">
+      <div style="display: flex; flex-direction: column; gap: 2px">
+        <div style="font-size: 17px; font-weight: 600; letter-spacing: -0.01em">Providers &amp; Keys</div>
+        <div style="font-size: 11.5px; color: #6E6A63">Key milikmu sendiri, dipakai hanya oleh agent di akun ini</div>
+      </div>
+      <div style="display: flex; align-items: center; gap: 8px">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#4FC3A1" stroke-width="1.8" stroke-linecap="round"><rect x="4.5" y="10.5" width="15" height="9.5" rx="1.5"></rect><path d="M8 10.5V7a4 4 0 0 1 8 0v3.5"></path></svg>
+        <div style="font-size: 11.5px; color: #8FD6BC">Terenkripsi saat disimpan &middot; tidak pernah ditampilkan lagi</div>
+      </div>
+    </div>
+
+    <div style="padding: 20px 28px; display: flex; flex-direction: column; gap: 16px; overflow: hidden">
+
+      <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px">
+
+        <!-- LLM -->
+        <div class="card" style="padding: 16px 18px; display: flex; flex-direction: column; gap: 12px">
+          <div style="display: flex; align-items: center; justify-content: space-between">
+            <div style="display: flex; align-items: center; gap: 9px">
+              <div class="lbl" style="color: #E8A33D">LLM</div>
+              <div style="font-size: 13.5px; font-weight: 600">Otak agent</div>
+            </div>
+            <div class="paid">TOKEN SENDIRI</div>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 5px">
+            <div class="lbl">Provider aktif</div>
+            <div class="field" style="display: flex; align-items: center; justify-content: space-between">
+              <span>omnirouter (OpenAI-compatible)</span>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#6E6A63" stroke-width="2" stroke-linecap="round"><path d="m6 9 6 6 6-6"></path></svg>
+            </div>
+          </div>
+          <div style="display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: 10px">
+            <div style="display: flex; flex-direction: column; gap: 5px">
+              <div class="lbl">Base URL</div>
+              <div class="field mono" style="font-size: 12px">http://localhost:20128/v1</div>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 5px">
+              <div class="lbl">Timeout</div>
+              <div class="field mono" style="font-size: 12px">20s</div>
+            </div>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 5px">
+            <div class="lbl">API key</div>
+            <div class="field mono" style="font-size: 12px; color: #A8A29A; display: flex; align-items: center; justify-content: space-between">
+              <span>sk-or-&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;4c2f</span>
+              <span style="font-size: 11px; color: #E8A33D; font-family: 'Archivo', sans-serif; font-weight: 500">Ganti</span>
+            </div>
+          </div>
+          <div style="display: flex; align-items: center; gap: 10px; padding-top: 3px">
+            <div class="btn">Tes koneksi</div>
+            <div style="display: flex; align-items: center; gap: 6px">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#4FC3A1" stroke-width="2.2" stroke-linecap="round"><path d="M20 6 9 17l-5-5"></path></svg>
+              <div class="mono" style="font-size: 11px; color: #8FD6BC">14 model terbaca &middot; 180ms</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- STT -->
+        <div class="card" style="padding: 16px 18px; display: flex; flex-direction: column; gap: 12px; border-color: #4A3A2A">
+          <div style="display: flex; align-items: center; justify-content: space-between">
+            <div style="display: flex; align-items: center; gap: 9px">
+              <div class="lbl" style="color: #E8A33D">STT</div>
+              <div style="font-size: 13.5px; font-weight: 600">Suara jadi teks</div>
+            </div>
+            <div class="paid">TOKEN SENDIRI</div>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 5px">
+            <div class="lbl">Provider aktif</div>
+            <div class="field" style="display: flex; align-items: center; justify-content: space-between">
+              <span>Groq &middot; whisper-large-v3-turbo</span>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#6E6A63" stroke-width="2" stroke-linecap="round"><path d="m6 9 6 6 6-6"></path></svg>
+            </div>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 5px">
+            <div class="lbl">API key</div>
+            <div class="field mono" style="font-size: 12px; color: #A8A29A; display: flex; align-items: center; justify-content: space-between">
+              <span>gsk_&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;e11a</span>
+              <span style="font-size: 11px; color: #E8A33D; font-family: 'Archivo', sans-serif; font-weight: 500">Ganti</span>
+            </div>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 5px">
+            <div class="lbl">Fallback kalau gagal</div>
+            <div class="field" style="display: flex; align-items: center; justify-content: space-between">
+              <span style="display: flex; align-items: center; gap: 8px">faster-whisper (lokal) <span class="free">GRATIS</span></span>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#6E6A63" stroke-width="2" stroke-linecap="round"><path d="m6 9 6 6 6-6"></path></svg>
+            </div>
+          </div>
+          <div style="display: flex; gap: 9px; background: #201C18; border-radius: 3px; padding: 9px 11px">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#E8A33D" stroke-width="1.8" stroke-linecap="round" style="flex-shrink: 0; margin-top: 1px"><path d="M12 9v4m0 3h.01M10.3 3.9 2.6 17.3A1.9 1.9 0 0 0 4.3 20h15.4a1.9 1.9 0 0 0 1.7-2.7L13.7 3.9a1.9 1.9 0 0 0-3.4 0z"></path></svg>
+            <div class="hint" style="color: #C9B48C">Kuota tersisa 8%. 4 turn sudah jatuh ke fallback hari ini.</div>
+          </div>
+        </div>
+
+        <!-- TTS -->
+        <div class="card" style="padding: 16px 18px; display: flex; flex-direction: column; gap: 12px">
+          <div style="display: flex; align-items: center; justify-content: space-between">
+            <div style="display: flex; align-items: center; gap: 9px">
+              <div class="lbl" style="color: #4FC3A1">TTS</div>
+              <div style="font-size: 13.5px; font-weight: 600">Teks jadi suara</div>
+            </div>
+            <div class="free">GRATIS &middot; LOKAL</div>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 5px">
+            <div class="lbl">Provider aktif</div>
+            <div class="field" style="display: flex; align-items: center; justify-content: space-between">
+              <span>Piper (lokal, id-ID)</span>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#6E6A63" stroke-width="2" stroke-linecap="round"><path d="m6 9 6 6 6-6"></path></svg>
+            </div>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 5px">
+            <div class="lbl">Suara terpasang</div>
+            <div style="display: flex; gap: 7px; flex-wrap: wrap">
+              <span style="font-size: 11.5px; padding: 5px 10px; border-radius: 3px; background: #3A342A; color: #E8A33D; font-weight: 500">id-ID Ardi</span>
+              <span style="font-size: 11.5px; padding: 5px 10px; border-radius: 3px; border: 1px solid #35322C; color: #A8A29A">id-ID Gadis</span>
+              <span style="font-size: 11.5px; padding: 5px 10px; border-radius: 3px; border: 1px dashed #35322C; color: #6E6A63">+ unduh suara</span>
+            </div>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 5px">
+            <div class="lbl">Format keluar ke device</div>
+            <div class="field mono" style="font-size: 12px; color: #A8A29A">opus &middot; 24000 Hz &middot; mono &middot; frame 60ms</div>
+            <div class="hint">Device melakukan resample sendiri, jadi 24 kHz aman dan kualitasnya lebih baik dari 16 kHz. Nilai ini dikirim di balasan handshake.</div>
+          </div>
+        </div>
+
+        <!-- Search -->
+        <div class="card" style="padding: 16px 18px; display: flex; flex-direction: column; gap: 12px">
+          <div style="display: flex; align-items: center; justify-content: space-between">
+            <div style="display: flex; align-items: center; gap: 9px">
+              <div class="lbl" style="color: #4FC3A1">SEARCH</div>
+              <div style="font-size: 13.5px; font-weight: 600">Cari info terkini</div>
+            </div>
+            <div class="free">GRATIS &middot; SELF-HOST</div>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 5px">
+            <div class="lbl">Provider aktif</div>
+            <div class="field" style="display: flex; align-items: center; justify-content: space-between">
+              <span>SearXNG (instance sendiri)</span>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#6E6A63" stroke-width="2" stroke-linecap="round"><path d="m6 9 6 6 6-6"></path></svg>
+            </div>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 5px">
+            <div class="lbl">Base URL</div>
+            <div class="field mono" style="font-size: 12px">http://searxng:8080</div>
+          </div>
+          <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px">
+            <div style="display: flex; flex-direction: column; gap: 5px">
+              <div class="lbl">Hasil per query</div>
+              <div class="field mono" style="font-size: 12px">3</div>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 5px">
+              <div class="lbl">Timeout</div>
+              <div class="field mono" style="font-size: 12px">4s</div>
+            </div>
+          </div>
+          <div class="hint">Cuma 3 hasil dan dipangkas pendek &mdash; hasil panjang bikin LLM lambat, dan device cuma butuh jawaban satu-dua kalimat.</div>
+        </div>
+      </div>
+
+      <!-- keamanan -->
+      <div class="card" style="padding: 15px 18px; display: flex; align-items: flex-start; gap: 13px">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#4FC3A1" stroke-width="1.8" stroke-linecap="round" style="flex-shrink: 0; margin-top: 1px"><path d="M12 3 4 6v6c0 5 3.4 8.3 8 9 4.6-.7 8-4 8-9V6z"></path><path d="m9 12 2 2 4-4"></path></svg>
+        <div style="display: flex; flex-direction: column; gap: 4px">
+          <div style="font-size: 13px; font-weight: 600">Bagaimana key kamu disimpan</div>
+          <div class="hint">Dienkripsi sebelum masuk database, dengan kunci utama yang tersimpan di luar database. Setelah disimpan, key tidak pernah dikirim balik ke browser &mdash; yang kamu lihat di atas hanya empat karakter terakhir. Tidak ada key yang dibagi antar akun, dan biaya pemakaian sepenuhnya ada di akun provider milikmu.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

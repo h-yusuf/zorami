@@ -1,0 +1,256 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+  <style>
+    body { margin: 0; background: #171614; color: #F2EFE8; font-family: 'Archivo', system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+    a { color: #E8A33D; text-decoration: none; }
+    a:hover { color: #F2BE68; }
+    .mono { font-family: 'IBM Plex Mono', ui-monospace, monospace; }
+    .nav { display: flex; align-items: center; gap: 10px; padding: 8px 18px 8px 15px; border-left: 3px solid transparent; color: #A8A29A; font-size: 13.5px; font-weight: 500; }
+    .nav.on { border-left-color: #E8A33D; color: #F2EFE8; background: #221F1B; }
+    .grp { padding: 16px 18px 6px; font-size: 10.5px; letter-spacing: 0.12em; color: #6E6A63; font-weight: 600; }
+    .card { background: #1F1E1B; border: 1px solid #302D28; border-radius: 3px; }
+    .lbl { font-size: 10.5px; letter-spacing: 0.1em; color: #6E6A63; font-weight: 600; text-transform: uppercase; }
+  </style>
+</helmet>
+
+<div style="display: flex; width: 1440px; height: 840px; overflow: hidden">
+
+  <!-- sidebar -->
+  <div style="width: 224px; flex-shrink: 0; background: #1B1A17; border-right: 1px solid #302D28; display: flex; flex-direction: column">
+    <div style="display: flex; align-items: center; gap: 9px; padding: 20px 18px 18px">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#E8A33D" stroke-width="1.7" stroke-linecap="round"><rect x="4" y="7" width="16" height="12" rx="2"></rect><path d="M8 7V5m8 2V5M9 12h.01M15 12h.01M9 16h6"></path></svg>
+      <div>
+        <div style="font-size: 15px; font-weight: 700; letter-spacing: 0.04em">ZORA</div>
+        <div class="mono" style="font-size: 9.5px; color: #6E6A63; letter-spacing: 0.1em">BRIDGE</div>
+      </div>
+    </div>
+
+    <div class="grp">INTI</div>
+    <div class="nav on">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="3" width="7" height="7" rx="1"></rect><rect x="14" y="3" width="7" height="7" rx="1"></rect><rect x="3" y="14" width="7" height="7" rx="1"></rect><rect x="14" y="14" width="7" height="7" rx="1"></rect></svg>
+      Overview
+    </div>
+    <div class="nav">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M12 3v3m0 12v3M5.6 5.6l2.1 2.1m8.6 8.6 2.1 2.1M3 12h3m12 0h3M5.6 18.4l2.1-2.1m8.6-8.6 2.1-2.1"></path><circle cx="12" cy="12" r="3.2"></circle></svg>
+      Agents
+    </div>
+    <div class="nav">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><rect x="6" y="6" width="12" height="12" rx="1.5"></rect><path d="M10 3v3m4-3v3m-4 12v3m4-3v3M3 10h3m-3 4h3m12-4h3m-3 4h3"></path></svg>
+      Devices
+    </div>
+    <div class="nav">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="8" cy="12" r="3.5"></circle><path d="M11.5 12H21m-4 0v3.5"></path></svg>
+      Providers &amp; Keys
+    </div>
+
+    <div class="grp">PANTAU</div>
+    <div class="nav">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M3 12h3.5l2-6 3 13 2.5-8 1.7 4H21"></path></svg>
+      Live Monitor
+    </div>
+    <div class="nav">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M20 15a2 2 0 0 1-2 2H8l-4 4V6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2z"></path></svg>
+      Percakapan
+    </div>
+
+    <div class="grp">AKUN</div>
+    <div class="nav">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="9" cy="8" r="3.2"></circle><path d="M3.5 19c0-3 2.5-5 5.5-5s5.5 2 5.5 5M16 5.5a3 3 0 0 1 0 5.6m1.5 2.9c2 .6 3.5 2.3 3.5 5"></path></svg>
+      <span style="flex-grow: 1">Users &amp; Roles</span>
+      <span class="mono" style="font-size: 8.5px; color: #6E6A63; border: 1px solid #35322C; padding: 1px 4px; border-radius: 2px">F3</span>
+    </div>
+
+    <div style="flex-grow: 1"></div>
+    <div style="border-top: 1px solid #302D28; padding: 14px 18px; display: flex; flex-direction: column; gap: 6px">
+      <div style="display: flex; align-items: center; gap: 8px">
+        <div style="width: 24px; height: 24px; border-radius: 2px; background: #3A342A; color: #E8A33D; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center">Y</div>
+        <div style="font-size: 11.5px; color: #A8A29A; overflow: hidden; text-overflow: ellipsis; white-space: nowrap">yusuf@tspindonesia.com</div>
+      </div>
+      <div class="mono" style="font-size: 9.5px; color: #56534D">v0.1.0-dev &middot; postgres ok</div>
+    </div>
+  </div>
+
+  <!-- main -->
+  <div style="flex-grow: 1; display: flex; flex-direction: column; overflow: hidden">
+
+    <div style="height: 60px; flex-shrink: 0; border-bottom: 1px solid #302D28; display: flex; align-items: center; justify-content: space-between; padding: 0 28px">
+      <div style="display: flex; flex-direction: column; gap: 2px">
+        <div style="font-size: 17px; font-weight: 600; letter-spacing: -0.01em">Overview</div>
+        <div style="font-size: 11.5px; color: #6E6A63">Ringkasan device, pipeline, dan aktivitas terakhir</div>
+      </div>
+      <div style="display: flex; align-items: center; gap: 10px">
+        <div style="display: flex; align-items: center; gap: 7px; background: #1F241F; border: 1px solid #2F4033; padding: 6px 11px; border-radius: 3px">
+          <div style="width: 6px; height: 6px; border-radius: 50%; background: #4FC3A1"></div>
+          <div style="font-size: 12px; color: #8FD6BC; font-weight: 500">Semua pipeline normal</div>
+        </div>
+        <div class="mono" style="font-size: 11px; color: #6E6A63; border: 1px solid #302D28; padding: 7px 10px; border-radius: 3px">24 JAM</div>
+      </div>
+    </div>
+
+    <div style="padding: 20px 28px; display: flex; flex-direction: column; gap: 18px; overflow: hidden">
+
+      <!-- stat tiles -->
+      <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px">
+        <div class="card" style="padding: 14px 16px; display: flex; flex-direction: column; gap: 7px">
+          <div class="lbl">Device aktif</div>
+          <div style="display: flex; align-items: baseline; gap: 6px">
+            <div class="mono" style="font-size: 27px; font-weight: 600; line-height: 1">2</div>
+            <div class="mono" style="font-size: 13px; color: #6E6A63">/ 3</div>
+          </div>
+          <div style="font-size: 11px; color: #6E6A63">1 offline sejak 4 jam lalu</div>
+        </div>
+        <div class="card" style="padding: 14px 16px; display: flex; flex-direction: column; gap: 7px">
+          <div class="lbl">Turn hari ini</div>
+          <div class="mono" style="font-size: 27px; font-weight: 600; line-height: 1">147</div>
+          <div style="font-size: 11px; color: #4FC3A1">12 pakai websearch</div>
+        </div>
+        <div class="card" style="padding: 14px 16px; display: flex; flex-direction: column; gap: 7px">
+          <div class="lbl">Respons p50</div>
+          <div style="display: flex; align-items: baseline; gap: 4px">
+            <div class="mono" style="font-size: 27px; font-weight: 600; line-height: 1">1.84</div>
+            <div class="mono" style="font-size: 13px; color: #6E6A63">s</div>
+          </div>
+          <div style="font-size: 11px; color: #6E6A63">mulut-ke-telinga, p95 3.1s</div>
+        </div>
+        <div class="card" style="padding: 14px 16px; display: flex; flex-direction: column; gap: 7px; border-color: #4A3A2A">
+          <div class="lbl">Jatuh ke fallback</div>
+          <div class="mono" style="font-size: 27px; font-weight: 600; line-height: 1; color: #E8A33D">4</div>
+          <div style="font-size: 11px; color: #E8A33D">semua di STT &mdash; kuota Groq</div>
+        </div>
+      </div>
+
+      <!-- pipeline strip -->
+      <div class="card" style="padding: 0">
+        <div style="display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border-bottom: 1px solid #302D28">
+          <div style="font-size: 13px; font-weight: 600">Pipeline adapter</div>
+          <div style="font-size: 11.5px; color: #6E6A63">Provider aktif per tahap &mdash; diambil dari key milik akun ini</div>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr))">
+          <div style="padding: 14px 16px; border-right: 1px solid #302D28; display: flex; flex-direction: column; gap: 6px">
+            <div style="display: flex; align-items: center; gap: 7px">
+              <div style="width: 6px; height: 6px; border-radius: 50%; background: #E8A33D"></div>
+              <div class="lbl">STT</div>
+            </div>
+            <div style="font-size: 13px; font-weight: 500">Groq whisper-large-v3-turbo</div>
+            <div class="mono" style="font-size: 11px; color: #E8A33D">kuota tersisa 8% &middot; p50 410ms</div>
+          </div>
+          <div style="padding: 14px 16px; border-right: 1px solid #302D28; display: flex; flex-direction: column; gap: 6px">
+            <div style="display: flex; align-items: center; gap: 7px">
+              <div style="width: 6px; height: 6px; border-radius: 50%; background: #4FC3A1"></div>
+              <div class="lbl">LLM</div>
+            </div>
+            <div style="font-size: 13px; font-weight: 500">omnirouter &middot; claude-sonnet-5</div>
+            <div class="mono" style="font-size: 11px; color: #6E6A63">p50 720ms &middot; token sendiri</div>
+          </div>
+          <div style="padding: 14px 16px; border-right: 1px solid #302D28; display: flex; flex-direction: column; gap: 6px">
+            <div style="display: flex; align-items: center; gap: 7px">
+              <div style="width: 6px; height: 6px; border-radius: 50%; background: #4FC3A1"></div>
+              <div class="lbl">TTS</div>
+            </div>
+            <div style="font-size: 13px; font-weight: 500">Piper &middot; id-ID Ardi (lokal)</div>
+            <div class="mono" style="font-size: 11px; color: #6E6A63">first-audio 240ms &middot; nol biaya</div>
+          </div>
+          <div style="padding: 14px 16px; display: flex; flex-direction: column; gap: 6px">
+            <div style="display: flex; align-items: center; gap: 7px">
+              <div style="width: 6px; height: 6px; border-radius: 50%; background: #4FC3A1"></div>
+              <div class="lbl">Search</div>
+            </div>
+            <div style="font-size: 13px; font-weight: 500">SearXNG (self-host)</div>
+            <div class="mono" style="font-size: 11px; color: #6E6A63">12 query &middot; p50 890ms</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- two col -->
+      <div style="display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); gap: 16px">
+
+        <!-- devices -->
+        <div class="card" style="padding: 0; display: flex; flex-direction: column">
+          <div style="display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border-bottom: 1px solid #302D28">
+            <div style="font-size: 13px; font-weight: 600">Device</div>
+            <div style="display: flex; align-items: center; gap: 6px; font-size: 11.5px; color: #E8A33D; font-weight: 500">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg>
+              Pasangkan device
+            </div>
+          </div>
+
+          <div style="display: flex; align-items: center; gap: 14px; padding: 13px 16px; border-bottom: 1px solid #26241F">
+            <div style="width: 7px; height: 7px; border-radius: 50%; background: #4FC3A1; flex-shrink: 0"></div>
+            <div style="flex-grow: 1; display: flex; flex-direction: column; gap: 3px">
+              <div style="font-size: 13.5px; font-weight: 500">Zora Ruang Tamu</div>
+              <div class="mono" style="font-size: 10.5px; color: #6E6A63">A4:CF:12:9B:00:7E &middot; agent: Zora Santai</div>
+            </div>
+            <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 3px">
+              <div style="font-size: 11.5px; color: #4FC3A1; font-weight: 500">Bicara</div>
+              <div class="mono" style="font-size: 10.5px; color: #6E6A63">wifi -48dBm &middot; 92%</div>
+            </div>
+          </div>
+
+          <div style="display: flex; align-items: center; gap: 14px; padding: 13px 16px; border-bottom: 1px solid #26241F">
+            <div style="width: 7px; height: 7px; border-radius: 50%; background: #4FC3A1; flex-shrink: 0"></div>
+            <div style="flex-grow: 1; display: flex; flex-direction: column; gap: 3px">
+              <div style="font-size: 13.5px; font-weight: 500">Zora Meja Kerja</div>
+              <div class="mono" style="font-size: 10.5px; color: #6E6A63">A4:CF:12:9B:03:C1 &middot; agent: Asisten Kerja</div>
+            </div>
+            <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 3px">
+              <div style="font-size: 11.5px; color: #A8A29A; font-weight: 500">Idle</div>
+              <div class="mono" style="font-size: 10.5px; color: #6E6A63">wifi -61dBm &middot; charging</div>
+            </div>
+          </div>
+
+          <div style="display: flex; align-items: center; gap: 14px; padding: 13px 16px">
+            <div style="width: 7px; height: 7px; border-radius: 50%; background: #56534D; flex-shrink: 0"></div>
+            <div style="flex-grow: 1; display: flex; flex-direction: column; gap: 3px">
+              <div style="font-size: 13.5px; font-weight: 500; color: #A8A29A">Zora Kamar Anak</div>
+              <div class="mono" style="font-size: 10.5px; color: #56534D">A4:CF:12:9B:11:2A &middot; agent: Zora Anak</div>
+            </div>
+            <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 3px">
+              <div style="font-size: 11.5px; color: #6E6A63; font-weight: 500">Offline</div>
+              <div class="mono" style="font-size: 10.5px; color: #56534D">terakhir 14:40</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- perlu perhatian -->
+        <div class="card" style="padding: 0; display: flex; flex-direction: column">
+          <div style="padding: 12px 16px; border-bottom: 1px solid #302D28; font-size: 13px; font-weight: 600">Perlu perhatian</div>
+
+          <div style="display: flex; gap: 11px; padding: 13px 16px; border-bottom: 1px solid #26241F">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#E8A33D" stroke-width="1.8" stroke-linecap="round" style="flex-shrink: 0; margin-top: 1px"><path d="M12 9v4m0 3h.01M10.3 3.9 2.6 17.3A1.9 1.9 0 0 0 4.3 20h15.4a1.9 1.9 0 0 0 1.7-2.7L13.7 3.9a1.9 1.9 0 0 0-3.4 0z"></path></svg>
+            <div style="display: flex; flex-direction: column; gap: 3px">
+              <div style="font-size: 12.5px; font-weight: 500">Kuota STT Groq hampir habis</div>
+              <div style="font-size: 11.5px; color: #6E6A63; line-height: 1.45">4 turn jatuh ke fallback lokal 3 jam terakhir, masing-masing +1.9s. Jadikan faster-whisper default, atau perbarui key.</div>
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 11px; padding: 13px 16px; border-bottom: 1px solid #26241F">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#A8A29A" stroke-width="1.8" stroke-linecap="round" style="flex-shrink: 0; margin-top: 1px"><circle cx="12" cy="12" r="9"></circle><path d="M12 8v4l2.5 2"></path></svg>
+            <div style="display: flex; flex-direction: column; gap: 3px">
+              <div style="font-size: 12.5px; font-weight: 500">Zora Kamar Anak offline 4 jam</div>
+              <div style="font-size: 11.5px; color: #6E6A63; line-height: 1.45">Handshake terakhir sukses. Kemungkinan device dimatikan, bukan masalah bridge.</div>
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 11px; padding: 13px 16px">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4FC3A1" stroke-width="1.8" stroke-linecap="round" style="flex-shrink: 0; margin-top: 1px"><path d="M20 6 9 17l-5-5"></path></svg>
+            <div style="display: flex; flex-direction: column; gap: 3px">
+              <div style="font-size: 12.5px; font-weight: 500">Firmware 1.9.2 tersedia</div>
+              <div style="font-size: 11.5px; color: #6E6A63; line-height: 1.45">Di-host bridge. Rollout per-device dari halaman Devices.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

@@ -1,0 +1,291 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+  <style>
+    body { margin: 0; background: #171614; color: #F2EFE8; font-family: 'Archivo', system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+    a { color: #E8A33D; text-decoration: none; }
+    a:hover { color: #F2BE68; }
+    .mono { font-family: 'IBM Plex Mono', ui-monospace, monospace; }
+    .nav { display: flex; align-items: center; gap: 10px; padding: 8px 18px 8px 15px; border-left: 3px solid transparent; color: #A8A29A; font-size: 13.5px; font-weight: 500; }
+    .nav.on { border-left-color: #E8A33D; color: #F2EFE8; background: #221F1B; }
+    .grp { padding: 16px 18px 6px; font-size: 10.5px; letter-spacing: 0.12em; color: #6E6A63; font-weight: 600; }
+    .card { background: #1F1E1B; border: 1px solid #302D28; border-radius: 3px; }
+    .lbl { font-size: 10.5px; letter-spacing: 0.1em; color: #6E6A63; font-weight: 600; text-transform: uppercase; }
+    .field { box-sizing: border-box; background: #171614; border: 1px solid #35322C; border-radius: 3px; padding: 9px 11px; font-size: 13px; color: #F2EFE8; }
+    .sec { font-size: 13.5px; font-weight: 600; }
+    .hint { font-size: 11.5px; color: #6E6A63; line-height: 1.5; }
+    .sw { width: 34px; height: 19px; border-radius: 10px; flex-shrink: 0; position: relative; }
+    .knob { position: absolute; top: 2px; width: 15px; height: 15px; border-radius: 50%; background: #F2EFE8; }
+  </style>
+</helmet>
+
+<div style="display: flex; width: 1440px; height: 1280px; overflow: hidden">
+
+  <!-- sidebar -->
+  <div style="width: 224px; flex-shrink: 0; background: #1B1A17; border-right: 1px solid #302D28; display: flex; flex-direction: column">
+    <div style="display: flex; align-items: center; gap: 9px; padding: 20px 18px 18px">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#E8A33D" stroke-width="1.7" stroke-linecap="round"><rect x="4" y="7" width="16" height="12" rx="2"></rect><path d="M8 7V5m8 2V5M9 12h.01M15 12h.01M9 16h6"></path></svg>
+      <div>
+        <div style="font-size: 15px; font-weight: 700; letter-spacing: 0.04em">ZORA</div>
+        <div class="mono" style="font-size: 9.5px; color: #6E6A63; letter-spacing: 0.1em">BRIDGE</div>
+      </div>
+    </div>
+    <div class="grp">INTI</div>
+    <div class="nav">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="3" width="7" height="7" rx="1"></rect><rect x="14" y="3" width="7" height="7" rx="1"></rect><rect x="3" y="14" width="7" height="7" rx="1"></rect><rect x="14" y="14" width="7" height="7" rx="1"></rect></svg>
+      Overview
+    </div>
+    <div class="nav on">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M12 3v3m0 12v3M5.6 5.6l2.1 2.1m8.6 8.6 2.1 2.1M3 12h3m12 0h3M5.6 18.4l2.1-2.1m8.6-8.6 2.1-2.1"></path><circle cx="12" cy="12" r="3.2"></circle></svg>
+      Agents
+    </div>
+    <div class="nav">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><rect x="6" y="6" width="12" height="12" rx="1.5"></rect><path d="M10 3v3m4-3v3m-4 12v3m4-3v3M3 10h3m-3 4h3m12-4h3m-3 4h3"></path></svg>
+      Devices
+    </div>
+    <div class="nav">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="8" cy="12" r="3.5"></circle><path d="M11.5 12H21m-4 0v3.5"></path></svg>
+      Providers &amp; Keys
+    </div>
+    <div class="grp">PANTAU</div>
+    <div class="nav">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M3 12h3.5l2-6 3 13 2.5-8 1.7 4H21"></path></svg>
+      Live Monitor
+    </div>
+    <div class="nav">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M20 15a2 2 0 0 1-2 2H8l-4 4V6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2z"></path></svg>
+      Percakapan
+    </div>
+    <div class="grp">AKUN</div>
+    <div class="nav">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="9" cy="8" r="3.2"></circle><path d="M3.5 19c0-3 2.5-5 5.5-5s5.5 2 5.5 5M16 5.5a3 3 0 0 1 0 5.6m1.5 2.9c2 .6 3.5 2.3 3.5 5"></path></svg>
+      <span style="flex-grow: 1">Users &amp; Roles</span>
+      <span class="mono" style="font-size: 8.5px; color: #6E6A63; border: 1px solid #35322C; padding: 1px 4px; border-radius: 2px">F3</span>
+    </div>
+    <div style="flex-grow: 1"></div>
+    <div style="border-top: 1px solid #302D28; padding: 14px 18px">
+      <div style="display: flex; align-items: center; gap: 8px">
+        <div style="width: 24px; height: 24px; border-radius: 2px; background: #3A342A; color: #E8A33D; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center">Y</div>
+        <div style="font-size: 11.5px; color: #A8A29A">yusuf@tspindonesia.com</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- agent list -->
+  <div style="width: 262px; flex-shrink: 0; border-right: 1px solid #302D28; display: flex; flex-direction: column; background: #1A1917">
+    <div style="padding: 16px 16px 12px; border-bottom: 1px solid #302D28; display: flex; flex-direction: column; gap: 11px">
+      <div style="display: flex; align-items: center; justify-content: space-between">
+        <div style="font-size: 14px; font-weight: 600">Agents</div>
+        <div class="mono" style="font-size: 10.5px; color: #6E6A63">3</div>
+      </div>
+      <div style="display: flex; align-items: center; gap: 7px; background: #E8A33D; color: #171614; padding: 7px 11px; border-radius: 3px; font-size: 12.5px; font-weight: 600; justify-content: center">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg>
+        Agent baru
+      </div>
+    </div>
+
+    <div style="padding: 13px 16px; border-bottom: 1px solid #26241F; border-left: 3px solid #E8A33D; background: #221F1B; display: flex; flex-direction: column; gap: 5px">
+      <div style="font-size: 13.5px; font-weight: 600">Zora Santai</div>
+      <div class="hint">Ngobrol santai, jawab pendek</div>
+      <div style="display: flex; gap: 5px; margin-top: 2px">
+        <span class="mono" style="font-size: 9.5px; color: #8FD6BC; background: #1F241F; border: 1px solid #2F4033; padding: 2px 5px; border-radius: 2px">1 device</span>
+        <span class="mono" style="font-size: 9.5px; color: #A8A29A; background: #221F1B; border: 1px solid #35322C; padding: 2px 5px; border-radius: 2px">memori on</span>
+      </div>
+    </div>
+
+    <div style="padding: 13px 16px; border-bottom: 1px solid #26241F; border-left: 3px solid transparent; display: flex; flex-direction: column; gap: 5px">
+      <div style="font-size: 13.5px; font-weight: 500; color: #D6D1C8">Asisten Kerja</div>
+      <div class="hint">Formal, ringkas, boleh websearch</div>
+      <div style="display: flex; gap: 5px; margin-top: 2px">
+        <span class="mono" style="font-size: 9.5px; color: #8FD6BC; background: #1F241F; border: 1px solid #2F4033; padding: 2px 5px; border-radius: 2px">1 device</span>
+      </div>
+    </div>
+
+    <div style="padding: 13px 16px; border-bottom: 1px solid #26241F; border-left: 3px solid transparent; display: flex; flex-direction: column; gap: 5px">
+      <div style="font-size: 13.5px; font-weight: 500; color: #D6D1C8">Zora Anak</div>
+      <div class="hint">Ramah anak, tanpa websearch</div>
+      <div style="display: flex; gap: 5px; margin-top: 2px">
+        <span class="mono" style="font-size: 9.5px; color: #6E6A63; background: #1D1C19; border: 1px solid #302D28; padding: 2px 5px; border-radius: 2px">device offline</span>
+      </div>
+    </div>
+
+    <div style="flex-grow: 1"></div>
+    <div style="padding: 13px 16px; border-top: 1px solid #302D28">
+      <div class="hint">Satu device dipasangkan ke satu agent. Ganti agent tidak perlu reboot device.</div>
+    </div>
+  </div>
+
+  <!-- editor -->
+  <div style="flex-grow: 1; display: flex; flex-direction: column; overflow: hidden">
+    <div style="height: 60px; flex-shrink: 0; border-bottom: 1px solid #302D28; display: flex; align-items: center; justify-content: space-between; padding: 0 24px">
+      <div style="display: flex; flex-direction: column; gap: 2px">
+        <div style="font-size: 17px; font-weight: 600">Zora Santai</div>
+        <div class="mono" style="font-size: 10.5px; color: #6E6A63">agent_01HQ8F &middot; diubah 2 jam lalu</div>
+      </div>
+      <div style="display: flex; align-items: center; gap: 9px">
+        <div style="font-size: 12.5px; color: #A8A29A; border: 1px solid #35322C; padding: 7px 13px; border-radius: 3px">Duplikat</div>
+        <div style="font-size: 12.5px; color: #171614; background: #E8A33D; padding: 7px 15px; border-radius: 3px; font-weight: 600">Simpan</div>
+      </div>
+    </div>
+
+    <div style="padding: 20px 24px; display: flex; flex-direction: column; gap: 16px; overflow: hidden">
+
+      <!-- identitas + persona -->
+      <div class="card" style="padding: 16px 18px; display: flex; flex-direction: column; gap: 14px">
+        <div class="sec">Identitas &amp; persona</div>
+        <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px">
+          <div style="display: flex; flex-direction: column; gap: 5px">
+            <div class="lbl">Nama agent</div>
+            <div class="field">Zora Santai</div>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 5px">
+            <div class="lbl">Nama panggilan (wake word)</div>
+            <div class="field" style="color: #A8A29A">Zora <span class="mono" style="font-size: 11px; color: #6E6A63">&mdash; dari firmware, read-only</span></div>
+          </div>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 5px">
+          <div style="display: flex; align-items: center; justify-content: space-between">
+            <div class="lbl">System prompt</div>
+            <div class="mono" style="font-size: 10.5px; color: #6E6A63">253 / 4000 karakter</div>
+          </div>
+          <div class="field" style="min-height: 74px; line-height: 1.55; color: #D6D1C8">Kamu Zora, asisten suara di rumah Yusuf. Jawab dalam Bahasa Indonesia yang santai dan singkat &mdash; maksimal dua kalimat, karena jawabanmu dibacakan lewat speaker kecil. Jangan pakai daftar bernomor, markdown, atau emoji. Kalau tidak tahu, bilang tidak tahu.</div>
+          <div class="hint">Jawaban dibacakan TTS, bukan dibaca. Prompt yang minta output pendek dan tanpa markdown itu bedanya antara terasa alami dan terasa robot.</div>
+        </div>
+      </div>
+
+      <!-- suara + model -->
+      <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px">
+        <div class="card" style="padding: 16px 18px; display: flex; flex-direction: column; gap: 13px">
+          <div class="sec">Suara</div>
+          <div style="display: flex; flex-direction: column; gap: 5px">
+            <div class="lbl">Voice TTS</div>
+            <div class="field" style="display: flex; align-items: center; justify-content: space-between">
+              <span>Piper &middot; id-ID Ardi (medium)</span>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#6E6A63" stroke-width="2" stroke-linecap="round"><path d="m6 9 6 6 6-6"></path></svg>
+            </div>
+          </div>
+          <div style="display: flex; align-items: center; gap: 9px">
+            <div style="display: flex; align-items: center; gap: 6px; border: 1px solid #35322C; padding: 6px 11px; border-radius: 3px; font-size: 12px; color: #D6D1C8">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#4FC3A1" stroke-width="1.8" stroke-linecap="round"><path d="m7 4 12 8-12 8z"></path></svg>
+              Dengar contoh
+            </div>
+            <div class="hint" style="flex-grow: 1">Kecepatan 1.0&times; &middot; jeda kalimat normal</div>
+          </div>
+          <div style="height: 1px; background: #302D28"></div>
+          <div style="display: flex; flex-direction: column; gap: 5px">
+            <div class="lbl">Ekspresi di layar device</div>
+            <div class="hint">Bridge mengirim <span class="mono" style="color: #A8A29A">type: llm</span> + emotion, device menampilkan wajahnya. Pilih seberapa ekspresif.</div>
+            <div style="display: flex; gap: 6px; margin-top: 3px">
+              <span style="font-size: 11.5px; padding: 5px 10px; border-radius: 3px; background: #3A342A; color: #E8A33D; font-weight: 500">Sedang</span>
+              <span style="font-size: 11.5px; padding: 5px 10px; border-radius: 3px; border: 1px solid #35322C; color: #A8A29A">Datar</span>
+              <span style="font-size: 11.5px; padding: 5px 10px; border-radius: 3px; border: 1px solid #35322C; color: #A8A29A">Ekspresif</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card" style="padding: 16px 18px; display: flex; flex-direction: column; gap: 13px">
+          <div class="sec">Model</div>
+          <div style="display: flex; flex-direction: column; gap: 5px">
+            <div class="lbl">LLM</div>
+            <div class="field" style="display: flex; align-items: center; justify-content: space-between">
+              <span>omnirouter &middot; claude-sonnet-5</span>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#6E6A63" stroke-width="2" stroke-linecap="round"><path d="m6 9 6 6 6-6"></path></svg>
+            </div>
+            <div class="hint">Daftar model diambil dari endpoint provider milikmu. Tiap agent boleh beda model.</div>
+          </div>
+          <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px">
+            <div style="display: flex; flex-direction: column; gap: 5px">
+              <div class="lbl">Temperature</div>
+              <div class="field mono">0.7</div>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 5px">
+              <div class="lbl">Batas token balasan</div>
+              <div class="field mono">160</div>
+            </div>
+          </div>
+          <div class="hint">Batas token rendah itu sengaja &mdash; jawaban panjang bikin TTS lama dan device terasa lambat.</div>
+        </div>
+      </div>
+
+      <!-- tools -->
+      <div class="card" style="padding: 16px 18px; display: flex; flex-direction: column; gap: 13px">
+        <div style="display: flex; align-items: center; justify-content: space-between">
+          <div class="sec">Tools</div>
+          <div class="hint">Diekspos ke LLM sebagai function-call</div>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 13px; padding: 11px 0; border-top: 1px solid #26241F">
+          <div class="sw" style="background: #4FC3A1"><div class="knob" style="right: 2px"></div></div>
+          <div style="flex-grow: 1; display: flex; flex-direction: column; gap: 3px">
+            <div style="font-size: 13px; font-weight: 500">Websearch</div>
+            <div class="hint">LLM memutuskan sendiri kapan perlu cari. Provider: SearXNG self-host.</div>
+          </div>
+          <div class="mono" style="font-size: 10.5px; color: #6E6A63">12 dipakai hari ini</div>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 13px; padding: 11px 0; border-top: 1px solid #26241F">
+          <div class="sw" style="background: #4FC3A1"><div class="knob" style="right: 2px"></div></div>
+          <div style="flex-grow: 1; display: flex; flex-direction: column; gap: 3px">
+            <div style="font-size: 13px; font-weight: 500">Kontrol device (MCP)</div>
+            <div class="hint">Volume, kecerahan, tema, status device &mdash; ditemukan otomatis dari device lewat <span class="mono" style="color: #A8A29A">tools/list</span>.</div>
+          </div>
+          <div class="mono" style="font-size: 10.5px; color: #6E6A63">4 tool diekspos ke LLM</div>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 13px; padding: 11px 0; border-top: 1px solid #26241F">
+          <div class="sw" style="background: #35322C"><div class="knob" style="left: 2px; background: #6E6A63"></div></div>
+          <div style="flex-grow: 1; display: flex; flex-direction: column; gap: 3px">
+            <div style="font-size: 13px; font-weight: 500; color: #A8A29A">Kamera (jawab soal apa yang dilihat)</div>
+            <div class="hint">Device kirim foto ke bridge, bridge yang menjalankan model vision. Butuh key provider vision.</div>
+          </div>
+          <div class="mono" style="font-size: 10.5px; color: #6E6A63">key belum diisi</div>
+        </div>
+
+        <div style="display: flex; gap: 11px; padding: 11px 13px; border-top: 1px solid #26241F; background: #201C18; border-radius: 3px; margin-top: 2px">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#E8A33D" stroke-width="1.8" stroke-linecap="round" style="flex-shrink: 0; margin-top: 1px"><rect x="4.5" y="10.5" width="15" height="9.5" rx="1.5"></rect><path d="M8 10.5V7a4 4 0 0 1 8 0v3.5"></path></svg>
+          <div class="hint" style="color: #C9B48C">Tool berbahaya device (<span class="mono">self.reboot</span>, <span class="mono">self.upgrade_firmware</span>) tidak pernah diekspos ke LLM &mdash; firmware tetap mau mengeksekusinya kalau dipanggil, jadi bridge yang memfilter. Hanya bisa dijalankan manual dari halaman Devices.</div>
+        </div>
+      </div>
+
+      <!-- memori -->
+      <div class="card" style="padding: 16px 18px; display: flex; flex-direction: column; gap: 13px">
+        <div style="display: flex; align-items: center; justify-content: space-between">
+          <div class="sec">Memori jangka panjang</div>
+          <div style="display: flex; align-items: center; gap: 10px">
+            <div class="mono" style="font-size: 10.5px; color: #6E6A63">18 fakta &middot; 6 ringkasan</div>
+            <div class="sw" style="background: #4FC3A1"><div class="knob" style="right: 2px"></div></div>
+          </div>
+        </div>
+        <div class="hint">Fakta tentang pemilik disuntik ke system prompt tiap turn. Ringkasan percakapan lama dipakai kalau topiknya nyambung. Semuanya bisa dihapus satu-satu &mdash; ini data pribadi, bukan cache.</div>
+
+        <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px">
+          <div style="display: flex; align-items: center; gap: 9px; background: #171614; border: 1px solid #302D28; border-radius: 3px; padding: 9px 11px">
+            <div style="flex-grow: 1; font-size: 12.5px; color: #D6D1C8">Punya anak umur 6 tahun, namanya Kayla</div>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#6E6A63" stroke-width="1.9" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"></path></svg>
+          </div>
+          <div style="display: flex; align-items: center; gap: 9px; background: #171614; border: 1px solid #302D28; border-radius: 3px; padding: 9px 11px">
+            <div style="flex-grow: 1; font-size: 12.5px; color: #D6D1C8">Kerja di TSP Indonesia, bagian IT</div>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#6E6A63" stroke-width="1.9" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"></path></svg>
+          </div>
+          <div style="display: flex; align-items: center; gap: 9px; background: #171614; border: 1px solid #302D28; border-radius: 3px; padding: 9px 11px">
+            <div style="flex-grow: 1; font-size: 12.5px; color: #D6D1C8">Tidak suka dibangunkan sebelum jam 6</div>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#6E6A63" stroke-width="1.9" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"></path></svg>
+          </div>
+          <div style="display: flex; align-items: center; gap: 9px; padding: 9px 11px; border: 1px dashed #35322C; border-radius: 3px">
+            <div style="flex-grow: 1; font-size: 12.5px; color: #6E6A63">Lihat 15 fakta lainnya</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

@@ -1,0 +1,250 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+  <style>
+    body { margin: 0; background: #171614; color: #F2EFE8; font-family: 'Archivo', system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+    a { color: #E8A33D; text-decoration: none; }
+    a:hover { color: #F2BE68; }
+    .mono { font-family: 'IBM Plex Mono', ui-monospace, monospace; }
+    .nav { display: flex; align-items: center; gap: 10px; padding: 8px 18px 8px 15px; border-left: 3px solid transparent; color: #A8A29A; font-size: 13.5px; font-weight: 500; }
+    .nav.on { border-left-color: #E8A33D; color: #F2EFE8; background: #221F1B; }
+    .grp { padding: 16px 18px 6px; font-size: 10.5px; letter-spacing: 0.12em; color: #6E6A63; font-weight: 600; }
+    .card { background: #1F1E1B; border: 1px solid #302D28; border-radius: 3px; }
+    .lbl { font-size: 10.5px; letter-spacing: 0.1em; color: #6E6A63; font-weight: 600; text-transform: uppercase; }
+    .hint { font-size: 11.5px; color: #6E6A63; line-height: 1.5; }
+    .mth { font-size: 10px; letter-spacing: 0.08em; color: #6E6A63; font-weight: 600; text-transform: uppercase; padding: 10px 12px; text-align: center; }
+    .mtd { padding: 11px 12px; display: flex; align-items: center; justify-content: center; }
+    .mrow { font-size: 12.5px; padding: 11px 14px; color: #D6D1C8; }
+  </style>
+</helmet>
+
+<div style="display: flex; width: 1440px; height: 900px; overflow: hidden">
+
+  <!-- sidebar -->
+  <div style="width: 224px; flex-shrink: 0; background: #1B1A17; border-right: 1px solid #302D28; display: flex; flex-direction: column">
+    <div style="display: flex; align-items: center; gap: 9px; padding: 20px 18px 18px">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#E8A33D" stroke-width="1.7" stroke-linecap="round"><rect x="4" y="7" width="16" height="12" rx="2"></rect><path d="M8 7V5m8 2V5M9 12h.01M15 12h.01M9 16h6"></path></svg>
+      <div>
+        <div style="font-size: 15px; font-weight: 700; letter-spacing: 0.04em">ZORA</div>
+        <div class="mono" style="font-size: 9.5px; color: #6E6A63; letter-spacing: 0.1em">BRIDGE</div>
+      </div>
+    </div>
+    <div class="grp">INTI</div>
+    <div class="nav">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="3" width="7" height="7" rx="1"></rect><rect x="14" y="3" width="7" height="7" rx="1"></rect><rect x="3" y="14" width="7" height="7" rx="1"></rect><rect x="14" y="14" width="7" height="7" rx="1"></rect></svg>
+      Overview
+    </div>
+    <div class="nav">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M12 3v3m0 12v3M5.6 5.6l2.1 2.1m8.6 8.6 2.1 2.1M3 12h3m12 0h3M5.6 18.4l2.1-2.1m8.6-8.6 2.1-2.1"></path><circle cx="12" cy="12" r="3.2"></circle></svg>
+      Agents
+    </div>
+    <div class="nav">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><rect x="6" y="6" width="12" height="12" rx="1.5"></rect><path d="M10 3v3m4-3v3m-4 12v3m4-3v3M3 10h3m-3 4h3m12-4h3m-3 4h3"></path></svg>
+      Devices
+    </div>
+    <div class="nav">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="8" cy="12" r="3.5"></circle><path d="M11.5 12H21m-4 0v3.5"></path></svg>
+      Providers &amp; Keys
+    </div>
+    <div class="grp">PANTAU</div>
+    <div class="nav">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M3 12h3.5l2-6 3 13 2.5-8 1.7 4H21"></path></svg>
+      Live Monitor
+    </div>
+    <div class="nav">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M20 15a2 2 0 0 1-2 2H8l-4 4V6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2z"></path></svg>
+      Percakapan
+    </div>
+    <div class="grp">AKUN</div>
+    <div class="nav on">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="9" cy="8" r="3.2"></circle><path d="M3.5 19c0-3 2.5-5 5.5-5s5.5 2 5.5 5M16 5.5a3 3 0 0 1 0 5.6m1.5 2.9c2 .6 3.5 2.3 3.5 5"></path></svg>
+      <span style="flex-grow: 1">Users &amp; Roles</span>
+      <span class="mono" style="font-size: 8.5px; color: #E8A33D; border: 1px solid #4A3A2A; padding: 1px 4px; border-radius: 2px">F3</span>
+    </div>
+    <div style="flex-grow: 1"></div>
+    <div style="border-top: 1px solid #302D28; padding: 14px 18px">
+      <div style="display: flex; align-items: center; gap: 8px">
+        <div style="width: 24px; height: 24px; border-radius: 2px; background: #3A342A; color: #E8A33D; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center">Y</div>
+        <div style="font-size: 11.5px; color: #A8A29A">yusuf@tspindonesia.com</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- main -->
+  <div style="flex-grow: 1; display: flex; flex-direction: column; overflow: hidden">
+    <div style="height: 60px; flex-shrink: 0; border-bottom: 1px solid #302D28; display: flex; align-items: center; justify-content: space-between; padding: 0 28px">
+      <div style="display: flex; flex-direction: column; gap: 2px">
+        <div style="font-size: 17px; font-weight: 600; letter-spacing: -0.01em">Users &amp; Roles</div>
+        <div style="font-size: 11.5px; color: #6E6A63">Siapa boleh melakukan apa di akun ini</div>
+      </div>
+      <div style="display: flex; align-items: center; gap: 8px; background: #201C18; border: 1px solid #4A3A2A; padding: 6px 11px; border-radius: 3px">
+        <div style="width: 6px; height: 6px; border-radius: 50%; background: #E8A33D"></div>
+        <div style="font-size: 11.5px; color: #C9B48C; font-weight: 500">Fase 3 &mdash; dirancang, belum aktif</div>
+      </div>
+    </div>
+
+    <div style="padding: 20px 28px; display: flex; flex-direction: column; gap: 16px; overflow: hidden">
+
+      <!-- catatan fase -->
+      <div class="card" style="padding: 14px 17px; display: flex; gap: 13px; border-color: #4A3A2A">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#E8A33D" stroke-width="1.8" stroke-linecap="round" style="flex-shrink: 0; margin-top: 1px"><circle cx="12" cy="12" r="9"></circle><path d="M12 8v.01M12 11v5"></path></svg>
+        <div class="hint" style="color: #C9B48C">Sampai fase ini dikerjakan, seluruh sistem jalan dengan satu pemilik tunggal yang dibuat saat pemasangan. Yang sudah disiapkan dari awal adalah bentuk datanya: setiap baris di database &mdash; agent, device, percakapan, key &mdash; sudah membawa penanda pemiliknya. Jadi menyalakan halaman ini nanti tidak butuh migrasi data, hanya menambah tabel peran dan lapisan pemeriksaan izin.</div>
+      </div>
+
+      <!-- matriks izin -->
+      <div class="card" style="padding: 0">
+        <div style="padding: 13px 17px; border-bottom: 1px solid #302D28; display: flex; align-items: center; justify-content: space-between">
+          <div style="font-size: 13.5px; font-weight: 600">Matriks izin</div>
+          <div class="hint">Peran bawaan, tidak bisa dihapus</div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: minmax(0, 1fr) 130px 130px 130px; border-bottom: 1px solid #302D28">
+          <div class="mth" style="text-align: left; padding-left: 14px">Kemampuan</div>
+          <div class="mth" style="color: #E8A33D">Owner</div>
+          <div class="mth">Operator</div>
+          <div class="mth">Viewer</div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: minmax(0, 1fr) 130px 130px 130px; border-bottom: 1px solid #26241F">
+          <div class="mrow">Buat &amp; ubah agent (persona, model, tools)</div>
+          <div class="mtd"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#4FC3A1" stroke-width="2.4" stroke-linecap="round"><path d="M20 6 9 17l-5-5"></path></svg></div>
+          <div class="mtd"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#4FC3A1" stroke-width="2.4" stroke-linecap="round"><path d="M20 6 9 17l-5-5"></path></svg></div>
+          <div class="mtd"><div style="width: 11px; height: 1.5px; background: #4A453D"></div></div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: minmax(0, 1fr) 130px 130px 130px; border-bottom: 1px solid #26241F">
+          <div class="mrow">Isi &amp; ganti API key provider</div>
+          <div class="mtd"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#4FC3A1" stroke-width="2.4" stroke-linecap="round"><path d="M20 6 9 17l-5-5"></path></svg></div>
+          <div class="mtd"><div style="width: 11px; height: 1.5px; background: #4A453D"></div></div>
+          <div class="mtd"><div style="width: 11px; height: 1.5px; background: #4A453D"></div></div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: minmax(0, 1fr) 130px 130px 130px; border-bottom: 1px solid #26241F">
+          <div class="mrow">Klaim &amp; lepas device</div>
+          <div class="mtd"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#4FC3A1" stroke-width="2.4" stroke-linecap="round"><path d="M20 6 9 17l-5-5"></path></svg></div>
+          <div class="mtd"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#4FC3A1" stroke-width="2.4" stroke-linecap="round"><path d="M20 6 9 17l-5-5"></path></svg></div>
+          <div class="mtd"><div style="width: 11px; height: 1.5px; background: #4A453D"></div></div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: minmax(0, 1fr) 130px 130px 130px; border-bottom: 1px solid #26241F">
+          <div class="mrow">Reboot device &amp; kirim firmware</div>
+          <div class="mtd"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#4FC3A1" stroke-width="2.4" stroke-linecap="round"><path d="M20 6 9 17l-5-5"></path></svg></div>
+          <div class="mtd"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#4FC3A1" stroke-width="2.4" stroke-linecap="round"><path d="M20 6 9 17l-5-5"></path></svg></div>
+          <div class="mtd"><div style="width: 11px; height: 1.5px; background: #4A453D"></div></div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: minmax(0, 1fr) 130px 130px 130px; border-bottom: 1px solid #26241F">
+          <div class="mrow" style="display: flex; flex-direction: column; gap: 3px">
+            <div>Baca transkrip percakapan</div>
+            <div class="hint">Isi rumah orang &mdash; sengaja dipisah dari izin memutar audio</div>
+          </div>
+          <div class="mtd"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#4FC3A1" stroke-width="2.4" stroke-linecap="round"><path d="M20 6 9 17l-5-5"></path></svg></div>
+          <div class="mtd"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#4FC3A1" stroke-width="2.4" stroke-linecap="round"><path d="M20 6 9 17l-5-5"></path></svg></div>
+          <div class="mtd"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#4FC3A1" stroke-width="2.4" stroke-linecap="round"><path d="M20 6 9 17l-5-5"></path></svg></div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: minmax(0, 1fr) 130px 130px 130px; border-bottom: 1px solid #26241F">
+          <div class="mrow">Putar ulang rekaman audio</div>
+          <div class="mtd"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#4FC3A1" stroke-width="2.4" stroke-linecap="round"><path d="M20 6 9 17l-5-5"></path></svg></div>
+          <div class="mtd"><div style="width: 11px; height: 1.5px; background: #4A453D"></div></div>
+          <div class="mtd"><div style="width: 11px; height: 1.5px; background: #4A453D"></div></div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: minmax(0, 1fr) 130px 130px 130px; border-bottom: 1px solid #26241F">
+          <div class="mrow">Hapus memori &amp; percakapan</div>
+          <div class="mtd"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#4FC3A1" stroke-width="2.4" stroke-linecap="round"><path d="M20 6 9 17l-5-5"></path></svg></div>
+          <div class="mtd"><div style="width: 11px; height: 1.5px; background: #4A453D"></div></div>
+          <div class="mtd"><div style="width: 11px; height: 1.5px; background: #4A453D"></div></div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: minmax(0, 1fr) 130px 130px 130px">
+          <div class="mrow">Undang &amp; atur peran anggota</div>
+          <div class="mtd"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#4FC3A1" stroke-width="2.4" stroke-linecap="round"><path d="M20 6 9 17l-5-5"></path></svg></div>
+          <div class="mtd"><div style="width: 11px; height: 1.5px; background: #4A453D"></div></div>
+          <div class="mtd"><div style="width: 11px; height: 1.5px; background: #4A453D"></div></div>
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: 16px">
+
+        <!-- anggota -->
+        <div class="card" style="padding: 0">
+          <div style="padding: 13px 17px; border-bottom: 1px solid #302D28; display: flex; align-items: center; justify-content: space-between">
+            <div style="font-size: 13.5px; font-weight: 600">Anggota</div>
+            <div style="display: flex; align-items: center; gap: 6px; font-size: 11.5px; color: #E8A33D; font-weight: 500">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg>
+              Undang lewat email
+            </div>
+          </div>
+
+          <div style="display: flex; align-items: center; gap: 12px; padding: 12px 17px; border-bottom: 1px solid #26241F">
+            <div style="width: 27px; height: 27px; border-radius: 2px; background: #3A342A; color: #E8A33D; font-size: 11.5px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0">Y</div>
+            <div style="flex-grow: 1; display: flex; flex-direction: column; gap: 2px">
+              <div style="font-size: 12.5px; font-weight: 500">yusuf@tspindonesia.com</div>
+              <div class="mono" style="font-size: 10px; color: #6E6A63">3 device &middot; 3 agent</div>
+            </div>
+            <div class="mono" style="font-size: 10px; color: #E8A33D; border: 1px solid #4A3A2A; padding: 3px 7px; border-radius: 2px">OWNER</div>
+          </div>
+
+          <div style="display: flex; align-items: center; gap: 12px; padding: 12px 17px; border-bottom: 1px solid #26241F">
+            <div style="width: 27px; height: 27px; border-radius: 2px; background: #2A2822; color: #A8A29A; font-size: 11.5px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0">R</div>
+            <div style="flex-grow: 1; display: flex; flex-direction: column; gap: 2px">
+              <div style="font-size: 12.5px; font-weight: 500; color: #D6D1C8">rina@&hellip;</div>
+              <div class="mono" style="font-size: 10px; color: #6E6A63">akses 1 device &middot; masuk terakhir kemarin</div>
+            </div>
+            <div class="mono" style="font-size: 10px; color: #A8A29A; border: 1px solid #35322C; padding: 3px 7px; border-radius: 2px">OPERATOR</div>
+          </div>
+
+          <div style="display: flex; align-items: center; gap: 12px; padding: 12px 17px">
+            <div style="width: 27px; height: 27px; border-radius: 2px; border: 1px dashed #35322C; display: flex; align-items: center; justify-content: center; flex-shrink: 0">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#6E6A63" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h10"></path></svg>
+            </div>
+            <div style="flex-grow: 1; display: flex; flex-direction: column; gap: 2px">
+              <div style="font-size: 12.5px; color: #A8A29A">budi@&hellip;</div>
+              <div class="mono" style="font-size: 10px; color: #6E6A63">undangan terkirim &middot; kedaluwarsa 6 hari</div>
+            </div>
+            <div class="mono" style="font-size: 10px; color: #6E6A63; border: 1px solid #302D28; padding: 3px 7px; border-radius: 2px">MENUNGGU</div>
+          </div>
+        </div>
+
+        <!-- pendaftaran -->
+        <div class="card" style="padding: 16px 17px; display: flex; flex-direction: column; gap: 13px">
+          <div style="font-size: 13.5px; font-weight: 600">Pendaftaran</div>
+          <div style="display: flex; align-items: flex-start; gap: 12px">
+            <div style="width: 34px; height: 19px; border-radius: 10px; background: #35322C; flex-shrink: 0; position: relative"><div style="position: absolute; top: 2px; left: 2px; width: 15px; height: 15px; border-radius: 50%; background: #6E6A63"></div></div>
+            <div style="display: flex; flex-direction: column; gap: 3px">
+              <div style="font-size: 12.5px; font-weight: 500">Pendaftaran terbuka</div>
+              <div class="hint">Mati. Akun baru hanya lewat undangan.</div>
+            </div>
+          </div>
+          <div style="height: 1px; background: #302D28"></div>
+          <div style="display: flex; flex-direction: column; gap: 8px">
+            <div style="display: flex; justify-content: space-between">
+              <div class="lbl">Sesi berakhir</div>
+              <div class="mono" style="font-size: 11px; color: #A8A29A">30 hari</div>
+            </div>
+            <div style="display: flex; justify-content: space-between">
+              <div class="lbl">Hash password</div>
+              <div class="mono" style="font-size: 11px; color: #A8A29A">argon2id</div>
+            </div>
+            <div style="display: flex; justify-content: space-between">
+              <div class="lbl">Isolasi data</div>
+              <div class="mono" style="font-size: 11px; color: #8FD6BC">per pemilik</div>
+            </div>
+          </div>
+          <div class="hint">Tanpa layanan login pihak ketiga &mdash; tidak ada yang perlu dibayar dan tidak ada data akun yang keluar dari server ini.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

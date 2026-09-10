@@ -1,0 +1,283 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+  <style>
+    body { margin: 0; background: #171614; color: #F2EFE8; font-family: 'Archivo', system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+    a { color: #E8A33D; text-decoration: none; }
+    a:hover { color: #F2BE68; }
+    .mono { font-family: 'IBM Plex Mono', ui-monospace, monospace; }
+    .nav { display: flex; align-items: center; gap: 10px; padding: 8px 18px 8px 15px; border-left: 3px solid transparent; color: #A8A29A; font-size: 13.5px; font-weight: 500; }
+    .nav.on { border-left-color: #E8A33D; color: #F2EFE8; background: #221F1B; }
+    .grp { padding: 16px 18px 6px; font-size: 10.5px; letter-spacing: 0.12em; color: #6E6A63; font-weight: 600; }
+    .card { background: #1F1E1B; border: 1px solid #302D28; border-radius: 3px; }
+    .lbl { font-size: 10.5px; letter-spacing: 0.1em; color: #6E6A63; font-weight: 600; text-transform: uppercase; }
+    .hint { font-size: 11.5px; color: #6E6A63; line-height: 1.5; }
+    .stage { display: flex; align-items: center; gap: 9px; font-size: 11px; }
+    .sname { width: 92px; flex-shrink: 0; color: #A8A29A; }
+    .bar { height: 7px; border-radius: 2px; }
+    .logrow { display: flex; gap: 10px; padding: 5px 0; font-size: 10.5px; align-items: baseline; }
+  </style>
+</helmet>
+
+<div style="display: flex; width: 1440px; height: 880px; overflow: hidden">
+
+  <!-- sidebar -->
+  <div style="width: 224px; flex-shrink: 0; background: #1B1A17; border-right: 1px solid #302D28; display: flex; flex-direction: column">
+    <div style="display: flex; align-items: center; gap: 9px; padding: 20px 18px 18px">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#E8A33D" stroke-width="1.7" stroke-linecap="round"><rect x="4" y="7" width="16" height="12" rx="2"></rect><path d="M8 7V5m8 2V5M9 12h.01M15 12h.01M9 16h6"></path></svg>
+      <div>
+        <div style="font-size: 15px; font-weight: 700; letter-spacing: 0.04em">ZORA</div>
+        <div class="mono" style="font-size: 9.5px; color: #6E6A63; letter-spacing: 0.1em">BRIDGE</div>
+      </div>
+    </div>
+    <div class="grp">INTI</div>
+    <div class="nav">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="3" width="7" height="7" rx="1"></rect><rect x="14" y="3" width="7" height="7" rx="1"></rect><rect x="3" y="14" width="7" height="7" rx="1"></rect><rect x="14" y="14" width="7" height="7" rx="1"></rect></svg>
+      Overview
+    </div>
+    <div class="nav">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M12 3v3m0 12v3M5.6 5.6l2.1 2.1m8.6 8.6 2.1 2.1M3 12h3m12 0h3M5.6 18.4l2.1-2.1m8.6-8.6 2.1-2.1"></path><circle cx="12" cy="12" r="3.2"></circle></svg>
+      Agents
+    </div>
+    <div class="nav">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><rect x="6" y="6" width="12" height="12" rx="1.5"></rect><path d="M10 3v3m4-3v3m-4 12v3m4-3v3M3 10h3m-3 4h3m12-4h3m-3 4h3"></path></svg>
+      Devices
+    </div>
+    <div class="nav">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="8" cy="12" r="3.5"></circle><path d="M11.5 12H21m-4 0v3.5"></path></svg>
+      Providers &amp; Keys
+    </div>
+    <div class="grp">PANTAU</div>
+    <div class="nav on">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M3 12h3.5l2-6 3 13 2.5-8 1.7 4H21"></path></svg>
+      Live Monitor
+    </div>
+    <div class="nav">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M20 15a2 2 0 0 1-2 2H8l-4 4V6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2z"></path></svg>
+      Percakapan
+    </div>
+    <div class="grp">AKUN</div>
+    <div class="nav">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="9" cy="8" r="3.2"></circle><path d="M3.5 19c0-3 2.5-5 5.5-5s5.5 2 5.5 5M16 5.5a3 3 0 0 1 0 5.6m1.5 2.9c2 .6 3.5 2.3 3.5 5"></path></svg>
+      <span style="flex-grow: 1">Users &amp; Roles</span>
+      <span class="mono" style="font-size: 8.5px; color: #6E6A63; border: 1px solid #35322C; padding: 1px 4px; border-radius: 2px">F3</span>
+    </div>
+    <div style="flex-grow: 1"></div>
+    <div style="border-top: 1px solid #302D28; padding: 14px 18px">
+      <div style="display: flex; align-items: center; gap: 8px">
+        <div style="width: 24px; height: 24px; border-radius: 2px; background: #3A342A; color: #E8A33D; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center">Y</div>
+        <div style="font-size: 11.5px; color: #A8A29A">yusuf@tspindonesia.com</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- main -->
+  <div style="flex-grow: 1; display: flex; flex-direction: column; overflow: hidden">
+    <div style="height: 60px; flex-shrink: 0; border-bottom: 1px solid #302D28; display: flex; align-items: center; justify-content: space-between; padding: 0 28px">
+      <div style="display: flex; align-items: center; gap: 14px">
+        <div style="display: flex; flex-direction: column; gap: 2px">
+          <div style="font-size: 17px; font-weight: 600; letter-spacing: -0.01em">Live Monitor</div>
+          <div style="font-size: 11.5px; color: #6E6A63">Aliran turn dan pesan protokol, langsung dari sesi device</div>
+        </div>
+      </div>
+      <div style="display: flex; align-items: center; gap: 9px">
+        <div class="mono" style="font-size: 11px; color: #A8A29A; border: 1px solid #302D28; padding: 7px 10px; border-radius: 3px">SEMUA DEVICE</div>
+        <div style="display: flex; align-items: center; gap: 7px; background: #1F241F; border: 1px solid #2F4033; padding: 6px 11px; border-radius: 3px">
+          <div style="width: 6px; height: 6px; border-radius: 50%; background: #4FC3A1"></div>
+          <div style="font-size: 12px; color: #8FD6BC; font-weight: 500">Live</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="padding: 20px 28px; display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: 18px; overflow: hidden">
+
+      <!-- turn stream -->
+      <div style="display: flex; flex-direction: column; gap: 13px">
+
+        <!-- turn aktif -->
+        <div class="card" style="padding: 15px 17px; border-color: #4A3A2A; display: flex; flex-direction: column; gap: 12px">
+          <div style="display: flex; align-items: center; gap: 9px">
+            <div style="width: 6px; height: 6px; border-radius: 50%; background: #E8A33D"></div>
+            <div style="font-size: 12.5px; font-weight: 600; color: #E8A33D">Sedang berjalan</div>
+            <div class="mono" style="font-size: 10.5px; color: #6E6A63">Zora Ruang Tamu &middot; 18:42:07</div>
+            <div style="flex-grow: 1"></div>
+            <div class="mono" style="font-size: 10.5px; color: #A8A29A">TTS mengalir&hellip;</div>
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 7px">
+            <div style="display: flex; gap: 9px">
+              <div class="mono" style="font-size: 10px; color: #6E6A63; width: 30px; flex-shrink: 0; padding-top: 2px">USER</div>
+              <div style="font-size: 13px; color: #F2EFE8; line-height: 1.5">Besok cuaca Surabaya gimana? Perlu bawa jas hujan nggak?</div>
+            </div>
+            <div style="display: flex; gap: 9px">
+              <div class="mono" style="font-size: 10px; color: #6E6A63; width: 30px; flex-shrink: 0; padding-top: 2px">ZORA</div>
+              <div style="font-size: 13px; color: #D6D1C8; line-height: 1.5">Besok Surabaya hujan ringan sore hari. Bawa jas hujan aja buat aman<span style="color: #6E6A63">&#9611;</span></div>
+            </div>
+          </div>
+
+          <div style="height: 1px; background: #302D28"></div>
+
+          <div style="display: flex; flex-direction: column; gap: 6px">
+            <div class="stage">
+              <div class="sname">Rekam</div>
+              <div class="bar" style="width: 148px; background: #35322C"></div>
+              <div class="mono" style="color: #6E6A63">2960ms</div>
+            </div>
+            <div class="stage">
+              <div class="sname">Endpoint VAD</div>
+              <div class="bar" style="width: 24px; background: #6E6A63"></div>
+              <div class="mono" style="color: #6E6A63">480ms &middot; sisi bridge</div>
+            </div>
+            <div class="stage">
+              <div class="sname">STT</div>
+              <div class="bar" style="width: 21px; background: #E8A33D"></div>
+              <div class="mono" style="color: #A8A29A">412ms &middot; groq</div>
+            </div>
+            <div class="stage">
+              <div class="sname">Search</div>
+              <div class="bar" style="width: 45px; background: #4FC3A1"></div>
+              <div class="mono" style="color: #A8A29A">890ms &middot; searxng &middot; 3 hasil</div>
+            </div>
+            <div class="stage">
+              <div class="sname">LLM</div>
+              <div class="bar" style="width: 36px; background: #4FC3A1"></div>
+              <div class="mono" style="color: #A8A29A">720ms &middot; sonnet-5 &middot; 1 tool-call</div>
+            </div>
+            <div class="stage">
+              <div class="sname">TTS awal</div>
+              <div class="bar" style="width: 12px; background: #4FC3A1"></div>
+              <div class="mono" style="color: #A8A29A">240ms &middot; piper</div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 9px; margin-top: 3px; padding-top: 7px; border-top: 1px dashed #302D28">
+              <div class="sname" style="font-size: 11px; color: #F2EFE8; font-weight: 600">Mulut ke telinga</div>
+              <div class="mono" style="font-size: 11.5px; color: #E8A33D; font-weight: 600">2.26s</div>
+              <div class="hint" style="flex-grow: 1">dihitung dari akhir bicara, bukan awal rekam</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- turn sebelumnya -->
+        <div class="card" style="padding: 14px 17px; display: flex; flex-direction: column; gap: 9px">
+          <div style="display: flex; align-items: center; gap: 9px">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#4FC3A1" stroke-width="2.2" stroke-linecap="round"><path d="M20 6 9 17l-5-5"></path></svg>
+            <div class="mono" style="font-size: 10.5px; color: #6E6A63">Zora Meja Kerja &middot; 18:39:51 &middot; 1.62s</div>
+            <div style="flex-grow: 1"></div>
+            <span class="mono" style="font-size: 9.5px; color: #8FD6BC; background: #1F241F; border: 1px solid #2F4033; padding: 2px 5px; border-radius: 2px">mcp</span>
+          </div>
+          <div style="font-size: 12.5px; color: #A8A29A; line-height: 1.5"><span class="mono" style="font-size: 10px; color: #6E6A63">USER</span> &nbsp;Kecilin volumenya dikit</div>
+          <div style="font-size: 12.5px; color: #A8A29A; line-height: 1.5"><span class="mono" style="font-size: 10px; color: #6E6A63">ZORA</span> &nbsp;Oke, sudah aku kecilin.</div>
+          <div style="display: flex; align-items: center; gap: 7px; background: #171614; border-radius: 3px; padding: 7px 10px">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#4FC3A1" stroke-width="1.9" stroke-linecap="round"><path d="m9 6 6 6-6 6"></path></svg>
+            <div class="mono" style="font-size: 10.5px; color: #8FD6BC">self.audio_speaker.set_volume &#123;volume: 45&#125; &rarr; ok</div>
+          </div>
+        </div>
+
+        <!-- turn gagal -->
+        <div class="card" style="padding: 14px 17px; display: flex; flex-direction: column; gap: 9px; border-color: #4A3A2A">
+          <div style="display: flex; align-items: center; gap: 9px">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#E8A33D" stroke-width="2" stroke-linecap="round"><path d="M20.5 12a8.5 8.5 0 1 1-2.6-6.1M20.5 4v4.5H16"></path></svg>
+            <div class="mono" style="font-size: 10.5px; color: #6E6A63">Zora Ruang Tamu &middot; 18:31:04</div>
+            <div style="flex-grow: 1"></div>
+            <span class="mono" style="font-size: 9.5px; color: #E8A33D; background: #201C18; border: 1px solid #4A3A2A; padding: 2px 5px; border-radius: 2px">stt fallback</span>
+          </div>
+          <div class="mono" style="font-size: 11px; color: #C9B48C; line-height: 1.5">groq: 429 rate_limit_exceeded &mdash; jatuh ke faster-whisper, berhasil pada percobaan ke-2 (+1.9s)</div>
+        </div>
+      </div>
+
+      <!-- kanan -->
+      <div style="display: flex; flex-direction: column; gap: 16px">
+
+        <!-- state device -->
+        <div class="card" style="padding: 15px 17px; display: flex; flex-direction: column; gap: 12px">
+          <div style="font-size: 13.5px; font-weight: 600">Status sesi</div>
+          <div style="display: flex; align-items: center; gap: 5px">
+            <div style="flex-grow: 1; text-align: center; font-size: 11px; padding: 7px 0; border-radius: 3px; background: #1D1C19; color: #6E6A63">Idle</div>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#35322C" stroke-width="2" stroke-linecap="round"><path d="m9 6 6 6-6 6"></path></svg>
+            <div style="flex-grow: 1; text-align: center; font-size: 11px; padding: 7px 0; border-radius: 3px; background: #1D1C19; color: #6E6A63">Listening</div>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#35322C" stroke-width="2" stroke-linecap="round"><path d="m9 6 6 6-6 6"></path></svg>
+            <div style="flex-grow: 1; text-align: center; font-size: 11px; padding: 7px 0; border-radius: 3px; background: #3A342A; color: #E8A33D; font-weight: 600">Speaking</div>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 8px">
+            <div style="display: flex; justify-content: space-between">
+              <div class="lbl">Mode listen</div>
+              <div class="mono" style="font-size: 11px; color: #A8A29A">auto &middot; AEC off</div>
+            </div>
+            <div style="display: flex; justify-content: space-between">
+              <div class="lbl">Session id</div>
+              <div class="mono" style="font-size: 11px; color: #A8A29A">s_9f2c41</div>
+            </div>
+            <div style="display: flex; justify-content: space-between">
+              <div class="lbl">Antrean audio device</div>
+              <div class="mono" style="font-size: 11px; color: #8FD6BC">11 / 20 frame</div>
+            </div>
+            <div style="display: flex; justify-content: space-between">
+              <div class="lbl">Idle timeout</div>
+              <div class="mono" style="font-size: 11px; color: #A8A29A">sisa 118s</div>
+            </div>
+          </div>
+          <div class="hint">Antrean device cuma 20 frame (1.2 detik). Kalau bridge mengirim TTS lebih cepat dari waktu nyata, frame kelebihan dibuang diam-diam &mdash; makanya pengiriman dijaga seirama.</div>
+        </div>
+
+        <!-- raw log -->
+        <div class="card" style="padding: 0; display: flex; flex-direction: column">
+          <div style="padding: 12px 17px; border-bottom: 1px solid #302D28; display: flex; align-items: center; justify-content: space-between">
+            <div style="font-size: 13.5px; font-weight: 600">Pesan protokol</div>
+            <div class="mono" style="font-size: 10px; color: #6E6A63">BINARY DIRINGKAS</div>
+          </div>
+          <div style="padding: 10px 17px 14px; display: flex; flex-direction: column">
+            <div class="logrow">
+              <div class="mono" style="color: #56534D; width: 58px; flex-shrink: 0">18:42:04</div>
+              <div class="mono" style="color: #4FC3A1; width: 26px; flex-shrink: 0">IN</div>
+              <div class="mono" style="color: #A8A29A">listen state=detect text="zora"</div>
+            </div>
+            <div class="logrow">
+              <div class="mono" style="color: #56534D; width: 58px; flex-shrink: 0">18:42:04</div>
+              <div class="mono" style="color: #4FC3A1; width: 26px; flex-shrink: 0">IN</div>
+              <div class="mono" style="color: #A8A29A">listen state=start mode=auto</div>
+            </div>
+            <div class="logrow">
+              <div class="mono" style="color: #56534D; width: 58px; flex-shrink: 0">18:42:04</div>
+              <div class="mono" style="color: #4FC3A1; width: 26px; flex-shrink: 0">IN</div>
+              <div class="mono" style="color: #6E6A63">binary &times;49 opus 60ms &middot; 2.94s</div>
+            </div>
+            <div class="logrow">
+              <div class="mono" style="color: #56534D; width: 58px; flex-shrink: 0">18:42:07</div>
+              <div class="mono" style="color: #E8A33D; width: 26px; flex-shrink: 0">OUT</div>
+              <div class="mono" style="color: #A8A29A">stt text="besok cuaca surabaya&hellip;"</div>
+            </div>
+            <div class="logrow">
+              <div class="mono" style="color: #56534D; width: 58px; flex-shrink: 0">18:42:08</div>
+              <div class="mono" style="color: #E8A33D; width: 26px; flex-shrink: 0">OUT</div>
+              <div class="mono" style="color: #A8A29A">llm emotion=thinking</div>
+            </div>
+            <div class="logrow">
+              <div class="mono" style="color: #56534D; width: 58px; flex-shrink: 0">18:42:09</div>
+              <div class="mono" style="color: #E8A33D; width: 26px; flex-shrink: 0">OUT</div>
+              <div class="mono" style="color: #A8A29A">tts state=start</div>
+            </div>
+            <div class="logrow">
+              <div class="mono" style="color: #56534D; width: 58px; flex-shrink: 0">18:42:09</div>
+              <div class="mono" style="color: #E8A33D; width: 26px; flex-shrink: 0">OUT</div>
+              <div class="mono" style="color: #A8A29A">tts state=sentence_start</div>
+            </div>
+            <div class="logrow">
+              <div class="mono" style="color: #56534D; width: 58px; flex-shrink: 0">18:42:09</div>
+              <div class="mono" style="color: #E8A33D; width: 26px; flex-shrink: 0">OUT</div>
+              <div class="mono" style="color: #6E6A63">binary &times;31 opus 60ms &middot; mengalir</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

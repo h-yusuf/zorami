@@ -1,0 +1,63 @@
+{
+  "artboards": [
+    { "file": "Main.dc.html", "x": 0, "y": 0, "w": 1440, "h": 840, "title": "Overview" },
+    { "file": "Agents.dc.html", "x": 1560, "y": 0, "w": 1440, "h": 1280, "title": "Agents" },
+    { "file": "Providers.dc.html", "x": 3120, "y": 0, "w": 1440, "h": 980, "title": "Providers & Keys" },
+    { "file": "Devices.dc.html", "x": 4680, "y": 0, "w": 1440, "h": 980, "title": "Devices & Pairing" },
+    { "file": "LiveMonitor.dc.html", "x": 0, "y": 1780, "w": 1440, "h": 880, "title": "Live Monitor" },
+    { "file": "Conversations.dc.html", "x": 1560, "y": 1780, "w": 1440, "h": 840, "title": "Percakapan" },
+    { "file": "UsersRoles.dc.html", "x": 3120, "y": 1780, "w": 1440, "h": 900, "title": "Users & Roles (Fase 3)" }
+  ],
+  "annotations": [
+    {
+      "id": "note-overview",
+      "x": 0,
+      "y": -360,
+      "w": 460,
+      "text": "OVERVIEW — halaman pertama setelah login.\n\nFitur: status tiap device (online/bicara/idle/offline, sinyal WiFi, baterai), empat angka ringkas, strip provider aktif per tahap pipeline dengan latensi p50, dan daftar hal yang perlu ditindak.\n\nKolom \"Perlu perhatian\" sengaja actionable, bukan sekadar notifikasi — tiap barisnya menyebut apa yang harus dilakukan."
+    },
+    {
+      "id": "note-agents",
+      "x": 1560,
+      "y": -360,
+      "w": 460,
+      "text": "AGENTS — inti produk. Satu agent = satu kepribadian lengkap.\n\nFitur: nama, system prompt, pilihan suara + dengar contoh, tingkat ekspresi wajah di layar device, model LLM per-agent, temperature, batas token, toggle tools, dan memori jangka panjang yang faktanya bisa dihapus satu-satu.\n\nCatatan di bagian Tools itu hasil riset firmware: tool berbahaya tetap dieksekusi device kalau dipanggil, jadi bridge yang wajib memfilter."
+    },
+    {
+      "id": "note-providers",
+      "x": 3120,
+      "y": -360,
+      "w": 460,
+      "text": "PROVIDERS & KEYS — tempat model BYOK hidup.\n\nFitur: pilih provider per tahap (LLM / STT / TTS / Search), isi key sendiri, tes koneksi dengan hasil nyata, dan tetapkan fallback kalau provider utama gagal atau habis kuota.\n\nLabel GRATIS versus TOKEN SENDIRI muncul di tiap kartu supaya jelas mana yang menagih. Key hanya ditampilkan empat karakter terakhir."
+    },
+    {
+      "id": "note-devices",
+      "x": 4680,
+      "y": -360,
+      "w": 460,
+      "text": "DEVICES — pemasangan tanpa colok kabel.\n\nFitur: klaim device dengan kode yang muncul di layarnya, daftar device dengan versi firmware dan status, detail device (token, Client-Id, uptime, daftar tool MCP yang terdeteksi otomatis), dan tindakan manual.\n\nAlur kode ini bukan bikinan sendiri — firmware xiaozhi sudah punya, jadi tidak perlu diubah sama sekali."
+    },
+    {
+      "id": "note-monitor",
+      "x": 0,
+      "y": 1420,
+      "w": 460,
+      "text": "LIVE MONITOR — satu-satunya fitur realtime yang masuk scope.\n\nFitur: turn berjalan beserta rincian waktu tiap tahap dan angka mulut-ke-telinga, status sesi device, kedalaman antrean audio device, serta log pesan protokol mentah.\n\nWaterfall waktu itu yang bikin \"kok lambat\" bisa dijawab, bukan ditebak. Panel antrean 20 frame ada karena kelebihan kirim dibuang diam-diam oleh device."
+    },
+    {
+      "id": "note-percakapan",
+      "x": 1560,
+      "y": 1420,
+      "w": 460,
+      "text": "PERCAKAPAN — riwayat yang bisa dicari.\n\nFitur: pencarian teks penuh lewat Postgres, filter device dan tanggal, transkrip per turn dengan provider & latensi yang dipakai, kutipan hasil websearch, penanda kapan memori disimpan, dan pemutaran audio.\n\nTingkat pencatatan diatur per agent: tidak dicatat / teks saja / teks + audio. Percakapan di dalam rumah adalah data paling sensitif di sistem ini."
+    },
+    {
+      "id": "note-rbac",
+      "x": 3120,
+      "y": 1420,
+      "w": 460,
+      "text": "USERS & ROLES — Fase 3, dirancang sekarang tapi dikerjakan terakhir.\n\nFitur: matriks izin tiga peran (Owner / Operator / Viewer), daftar anggota dengan undangan, dan pengaturan pendaftaran.\n\nIzin \"baca transkrip\" dipisah dari \"putar audio\" — mendengar rekaman rumah orang beda level dari membaca ringkasannya.\n\nBentuk data multi-tenant disiapkan sejak awal supaya menyalakan halaman ini nanti tidak butuh migrasi."
+    }
+  ],
+  "launch": { "view": "canvas" }
+}

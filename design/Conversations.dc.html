@@ -1,0 +1,220 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+  <style>
+    body { margin: 0; background: #171614; color: #F2EFE8; font-family: 'Archivo', system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+    a { color: #E8A33D; text-decoration: none; }
+    a:hover { color: #F2BE68; }
+    .mono { font-family: 'IBM Plex Mono', ui-monospace, monospace; }
+    .nav { display: flex; align-items: center; gap: 10px; padding: 8px 18px 8px 15px; border-left: 3px solid transparent; color: #A8A29A; font-size: 13.5px; font-weight: 500; }
+    .nav.on { border-left-color: #E8A33D; color: #F2EFE8; background: #221F1B; }
+    .grp { padding: 16px 18px 6px; font-size: 10.5px; letter-spacing: 0.12em; color: #6E6A63; font-weight: 600; }
+    .card { background: #1F1E1B; border: 1px solid #302D28; border-radius: 3px; }
+    .lbl { font-size: 10.5px; letter-spacing: 0.1em; color: #6E6A63; font-weight: 600; text-transform: uppercase; }
+    .hint { font-size: 11.5px; color: #6E6A63; line-height: 1.5; }
+    .chip { font-size: 11.5px; padding: 5px 10px; border-radius: 3px; border: 1px solid #35322C; color: #A8A29A; }
+  </style>
+</helmet>
+
+<div style="display: flex; width: 1440px; height: 840px; overflow: hidden">
+
+  <!-- sidebar -->
+  <div style="width: 224px; flex-shrink: 0; background: #1B1A17; border-right: 1px solid #302D28; display: flex; flex-direction: column">
+    <div style="display: flex; align-items: center; gap: 9px; padding: 20px 18px 18px">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#E8A33D" stroke-width="1.7" stroke-linecap="round"><rect x="4" y="7" width="16" height="12" rx="2"></rect><path d="M8 7V5m8 2V5M9 12h.01M15 12h.01M9 16h6"></path></svg>
+      <div>
+        <div style="font-size: 15px; font-weight: 700; letter-spacing: 0.04em">ZORA</div>
+        <div class="mono" style="font-size: 9.5px; color: #6E6A63; letter-spacing: 0.1em">BRIDGE</div>
+      </div>
+    </div>
+    <div class="grp">INTI</div>
+    <div class="nav">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="3" width="7" height="7" rx="1"></rect><rect x="14" y="3" width="7" height="7" rx="1"></rect><rect x="3" y="14" width="7" height="7" rx="1"></rect><rect x="14" y="14" width="7" height="7" rx="1"></rect></svg>
+      Overview
+    </div>
+    <div class="nav">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M12 3v3m0 12v3M5.6 5.6l2.1 2.1m8.6 8.6 2.1 2.1M3 12h3m12 0h3M5.6 18.4l2.1-2.1m8.6-8.6 2.1-2.1"></path><circle cx="12" cy="12" r="3.2"></circle></svg>
+      Agents
+    </div>
+    <div class="nav">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><rect x="6" y="6" width="12" height="12" rx="1.5"></rect><path d="M10 3v3m4-3v3m-4 12v3m4-3v3M3 10h3m-3 4h3m12-4h3m-3 4h3"></path></svg>
+      Devices
+    </div>
+    <div class="nav">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="8" cy="12" r="3.5"></circle><path d="M11.5 12H21m-4 0v3.5"></path></svg>
+      Providers &amp; Keys
+    </div>
+    <div class="grp">PANTAU</div>
+    <div class="nav">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M3 12h3.5l2-6 3 13 2.5-8 1.7 4H21"></path></svg>
+      Live Monitor
+    </div>
+    <div class="nav on">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M20 15a2 2 0 0 1-2 2H8l-4 4V6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2z"></path></svg>
+      Percakapan
+    </div>
+    <div class="grp">AKUN</div>
+    <div class="nav">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="9" cy="8" r="3.2"></circle><path d="M3.5 19c0-3 2.5-5 5.5-5s5.5 2 5.5 5M16 5.5a3 3 0 0 1 0 5.6m1.5 2.9c2 .6 3.5 2.3 3.5 5"></path></svg>
+      <span style="flex-grow: 1">Users &amp; Roles</span>
+      <span class="mono" style="font-size: 8.5px; color: #6E6A63; border: 1px solid #35322C; padding: 1px 4px; border-radius: 2px">F3</span>
+    </div>
+    <div style="flex-grow: 1"></div>
+    <div style="border-top: 1px solid #302D28; padding: 14px 18px">
+      <div style="display: flex; align-items: center; gap: 8px">
+        <div style="width: 24px; height: 24px; border-radius: 2px; background: #3A342A; color: #E8A33D; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center">Y</div>
+        <div style="font-size: 11.5px; color: #A8A29A">yusuf@tspindonesia.com</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- list -->
+  <div style="width: 300px; flex-shrink: 0; border-right: 1px solid #302D28; background: #1A1917; display: flex; flex-direction: column">
+    <div style="padding: 15px 16px; border-bottom: 1px solid #302D28; display: flex; flex-direction: column; gap: 11px">
+      <div style="display: flex; align-items: center; gap: 9px; background: #171614; border: 1px solid #35322C; border-radius: 3px; padding: 8px 11px">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6E6A63" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="m16.5 16.5 4 4"></path></svg>
+        <div style="font-size: 12.5px; color: #F2EFE8; flex-grow: 1">jas hujan</div>
+        <div class="mono" style="font-size: 10px; color: #6E6A63">1 cocok</div>
+      </div>
+      <div style="display: flex; gap: 6px">
+        <div class="chip" style="border-color: #4A3A2A; color: #E8A33D">Semua device</div>
+        <div class="chip">7 hari</div>
+      </div>
+      <div class="hint">Pencarian teks penuh lewat Postgres &mdash; tanpa layanan pencarian tambahan.</div>
+    </div>
+
+    <div style="padding: 13px 16px; border-bottom: 1px solid #26241F; border-left: 3px solid #E8A33D; background: #221F1B; display: flex; flex-direction: column; gap: 5px">
+      <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 8px">
+        <div style="font-size: 13px; font-weight: 600">Cuaca dan rencana besok</div>
+        <div class="mono" style="font-size: 9.5px; color: #6E6A63; flex-shrink: 0">18:42</div>
+      </div>
+      <div class="hint">Zora Ruang Tamu &middot; Zora Santai &middot; 6 turn</div>
+      <div style="font-size: 11.5px; color: #A8A29A; line-height: 1.45">&hellip;besok Surabaya hujan ringan sore hari, bawa <span style="background: #3A342A; color: #E8A33D">jas hujan</span> aja&hellip;</div>
+    </div>
+
+    <div style="padding: 13px 16px; border-bottom: 1px solid #26241F; border-left: 3px solid transparent; display: flex; flex-direction: column; gap: 5px">
+      <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 8px">
+        <div style="font-size: 13px; font-weight: 500; color: #D6D1C8">Volume dan lampu ruang tamu</div>
+        <div class="mono" style="font-size: 9.5px; color: #6E6A63; flex-shrink: 0">18:39</div>
+      </div>
+      <div class="hint">Zora Meja Kerja &middot; Asisten Kerja &middot; 2 turn</div>
+    </div>
+
+    <div style="padding: 13px 16px; border-bottom: 1px solid #26241F; border-left: 3px solid transparent; display: flex; flex-direction: column; gap: 5px">
+      <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 8px">
+        <div style="font-size: 13px; font-weight: 500; color: #D6D1C8">Jadwal rapat Senin</div>
+        <div class="mono" style="font-size: 9.5px; color: #6E6A63; flex-shrink: 0">Kmr</div>
+      </div>
+      <div class="hint">Zora Meja Kerja &middot; Asisten Kerja &middot; 11 turn</div>
+    </div>
+
+    <div style="padding: 13px 16px; border-left: 3px solid transparent; display: flex; flex-direction: column; gap: 5px">
+      <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 8px">
+        <div style="font-size: 13px; font-weight: 500; color: #D6D1C8">Cerita sebelum tidur</div>
+        <div class="mono" style="font-size: 9.5px; color: #6E6A63; flex-shrink: 0">Kmr</div>
+      </div>
+      <div class="hint">Zora Kamar Anak &middot; Zora Anak &middot; 8 turn</div>
+    </div>
+
+    <div style="flex-grow: 1"></div>
+  </div>
+
+  <!-- transcript -->
+  <div style="flex-grow: 1; display: flex; flex-direction: column; overflow: hidden">
+    <div style="height: 60px; flex-shrink: 0; border-bottom: 1px solid #302D28; display: flex; align-items: center; justify-content: space-between; padding: 0 24px">
+      <div style="display: flex; flex-direction: column; gap: 2px">
+        <div style="font-size: 17px; font-weight: 600">Cuaca dan rencana besok</div>
+        <div class="mono" style="font-size: 10.5px; color: #6E6A63">s_9f2c41 &middot; 10 Sep 2026 18:42 WIB &middot; 6 turn</div>
+      </div>
+      <div style="display: flex; align-items: center; gap: 9px">
+        <div class="chip">Ekspor</div>
+        <div class="chip" style="border-color: #4A2E28; color: #E4674F">Hapus</div>
+      </div>
+    </div>
+
+    <div style="padding: 20px 24px; display: flex; flex-direction: column; gap: 14px; overflow: hidden">
+
+      <!-- turn 1 -->
+      <div class="card" style="padding: 14px 16px; display: flex; flex-direction: column; gap: 11px">
+        <div style="display: flex; gap: 11px">
+          <div class="mono" style="font-size: 10px; color: #6E6A63; width: 34px; flex-shrink: 0; padding-top: 2px">USER</div>
+          <div style="flex-grow: 1; font-size: 13.5px; line-height: 1.5">Besok cuaca Surabaya gimana? Perlu bawa jas hujan nggak?</div>
+          <div style="display: flex; align-items: center; gap: 7px; flex-shrink: 0">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#4FC3A1" stroke-width="1.8" stroke-linecap="round"><path d="m7 4 12 8-12 8z"></path></svg>
+            <div class="mono" style="font-size: 10px; color: #6E6A63">2.9s</div>
+          </div>
+        </div>
+        <div style="display: flex; gap: 11px">
+          <div class="mono" style="font-size: 10px; color: #6E6A63; width: 34px; flex-shrink: 0; padding-top: 2px">ZORA</div>
+          <div style="flex-grow: 1; font-size: 13.5px; line-height: 1.5; color: #D6D1C8">Besok Surabaya hujan ringan sore hari. Bawa jas hujan aja buat aman.</div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 7px; padding: 8px 11px; background: #171614; border-radius: 3px">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#4FC3A1" stroke-width="1.9" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="m16.5 16.5 4 4"></path></svg>
+          <div class="mono" style="font-size: 10.5px; color: #8FD6BC; flex-grow: 1">web_search("cuaca Surabaya besok") &rarr; 3 hasil</div>
+          <div class="mono" style="font-size: 10px; color: #6E6A63">lihat kutipan</div>
+        </div>
+        <div style="display: flex; gap: 16px; padding-top: 3px; border-top: 1px solid #26241F">
+          <div class="mono" style="font-size: 10px; color: #56534D">stt groq &middot; 412ms</div>
+          <div class="mono" style="font-size: 10px; color: #56534D">llm sonnet-5 &middot; 720ms &middot; 138 tok</div>
+          <div class="mono" style="font-size: 10px; color: #56534D">tts piper &middot; 240ms</div>
+          <div style="flex-grow: 1"></div>
+          <div class="mono" style="font-size: 10px; color: #A8A29A">total 2.26s</div>
+        </div>
+      </div>
+
+      <!-- turn 2 -->
+      <div class="card" style="padding: 14px 16px; display: flex; flex-direction: column; gap: 11px">
+        <div style="display: flex; gap: 11px">
+          <div class="mono" style="font-size: 10px; color: #6E6A63; width: 34px; flex-shrink: 0; padding-top: 2px">USER</div>
+          <div style="flex-grow: 1; font-size: 13.5px; line-height: 1.5">Kalau gitu ingetin aku besok pagi ya</div>
+          <div style="display: flex; align-items: center; gap: 7px; flex-shrink: 0">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#4FC3A1" stroke-width="1.8" stroke-linecap="round"><path d="m7 4 12 8-12 8z"></path></svg>
+            <div class="mono" style="font-size: 10px; color: #6E6A63">1.7s</div>
+          </div>
+        </div>
+        <div style="display: flex; gap: 11px">
+          <div class="mono" style="font-size: 10px; color: #6E6A63; width: 34px; flex-shrink: 0; padding-top: 2px">ZORA</div>
+          <div style="flex-grow: 1; font-size: 13.5px; line-height: 1.5; color: #D6D1C8">Aku belum bisa ngingetin sendiri. Tapi aku catat kamu nggak suka dibangunin sebelum jam 6.</div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 7px; padding: 8px 11px; background: #171614; border-radius: 3px">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#E8A33D" stroke-width="1.9" stroke-linecap="round"><path d="M12 3 4 6v6c0 5 3.4 8.3 8 9 4.6-.7 8-4 8-9V6z"></path></svg>
+          <div class="mono" style="font-size: 10.5px; color: #C9B48C; flex-grow: 1">memori disimpan: "tidak suka dibangunkan sebelum jam 6"</div>
+          <div class="mono" style="font-size: 10px; color: #6E6A63">kelola</div>
+        </div>
+      </div>
+
+      <!-- privasi -->
+      <div class="card" style="padding: 15px 16px; display: flex; flex-direction: column; gap: 12px">
+        <div style="display: flex; align-items: center; justify-content: space-between">
+          <div style="font-size: 13px; font-weight: 600">Tingkat pencatatan &mdash; per agent</div>
+          <div class="mono" style="font-size: 10.5px; color: #6E6A63">Zora Santai: teks + audio</div>
+        </div>
+        <div style="display: flex; gap: 8px">
+          <div style="flex-grow: 1; padding: 10px 12px; border-radius: 3px; border: 1px solid #35322C; display: flex; flex-direction: column; gap: 4px">
+            <div style="font-size: 12.5px; color: #A8A29A; font-weight: 500">Tidak dicatat</div>
+            <div class="hint">Turn diproses lalu dilupakan</div>
+          </div>
+          <div style="flex-grow: 1; padding: 10px 12px; border-radius: 3px; border: 1px solid #35322C; display: flex; flex-direction: column; gap: 4px">
+            <div style="font-size: 12.5px; color: #A8A29A; font-weight: 500">Teks saja</div>
+            <div class="hint">Transkrip disimpan, audio dibuang</div>
+          </div>
+          <div style="flex-grow: 1; padding: 10px 12px; border-radius: 3px; border: 1px solid #E8A33D; background: #221F1B; display: flex; flex-direction: column; gap: 4px">
+            <div style="font-size: 12.5px; color: #E8A33D; font-weight: 600">Teks + audio</div>
+            <div class="hint">Bisa diputar ulang &middot; file di disk, bukan di database</div>
+          </div>
+        </div>
+        <div class="hint">Percakapan di rumah itu data paling sensitif di sistem ini. Retensi audio 30 hari, lalu dihapus otomatis; transkrip mengikuti pengaturan retensi akun.</div>
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>
