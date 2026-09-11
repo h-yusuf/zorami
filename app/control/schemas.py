@@ -106,6 +106,12 @@ class DeviceClaimOut(BaseModel):
     claimed: bool = True
 
 
+class PendingActivationOut(BaseModel):
+    device_id: str  # MAC device yang menunggu diklaim
+    client_id: str
+    created_at: datetime
+
+
 class ConversationOut(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 

@@ -146,6 +146,39 @@ async def test_claim_device_requires_auth(client):
     assert r.status_code == 401
 
 
+async def test_pending_activations_lists_unclaimed_unexpired(client, auth_headers):
+    await _make_activation_code(code="AAA111")
+    r = client.get("/api/devices/pending", headers=auth_headers)
+    assert r.status_code == 200
+    body = r.json()
+    assert len(body) == 1
+    assert body[0]["device_id"].startswith("AA:BB:CC:DD:EE:")
+    assert body[0]["client_id"] == "client-1"
+
+
+async def test_pending_activations_excludes_claimed(client, auth_headers, seeded_owner):
+    await _make_activation_code(
+        code="BBB222",
+        claimed_at=datetime.now(timezone.utc),
+        claimed_by_owner_id=seeded_owner["owner_id"],
+    )
+    r = client.get("/api/devices/pending", headers=auth_headers)
+    assert r.status_code == 200
+    assert r.json() == []
+
+
+async def test_pending_activations_excludes_expired(client, auth_headers):
+    await _make_activation_code(code="CCC333", expires_delta=timedelta(minutes=-1))
+    r = client.get("/api/devices/pending", headers=auth_headers)
+    assert r.status_code == 200
+    assert r.json() == []
+
+
+async def test_pending_activations_requires_auth(client):
+    r = client.get("/api/devices/pending")
+    assert r.status_code == 401
+
+
 async def test_delete_device_with_conversation_history_returns_409(
     client, auth_headers, seeded_owner
 ):

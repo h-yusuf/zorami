@@ -7,7 +7,13 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.control.auth import get_current_owner
-from app.control.schemas import DeviceClaimIn, DeviceClaimOut, DeviceOut, DeviceUpdate
+from app.control.schemas import (
+    DeviceClaimIn,
+    DeviceClaimOut,
+    DeviceOut,
+    DeviceUpdate,
+    PendingActivationOut,
+)
 from app.core.db import get_session
 from app.core.models import ActivationCode, Device
 
@@ -61,6 +67,27 @@ async def list_devices(
 ):
     result = await db.execute(select(Device).where(Device.owner_id == uuid.UUID(owner_id)))
     return [_to_out(d) for d in result.scalars().all()]
+
+
+@router.get("/pending", response_model=list[PendingActivationOut])
+async def list_pending_activations(
+    owner_id: str = Depends(get_current_owner), db: AsyncSession = Depends(get_session)
+):
+    """Device yang sudah nyala dan minta kode aktivasi tapi belum diklaim siapa pun.
+    Kode-nya sendiri sengaja tidak diekspos di sini - itu harus dibaca langsung dari
+    layar device, supaya klaim tetap butuh kehadiran fisik di depan device."""
+    now = datetime.now(timezone.utc)
+    result = await db.execute(
+        select(ActivationCode)
+        .where(ActivationCode.claimed_at.is_(None), ActivationCode.expires_at > now)
+        .order_by(ActivationCode.created_at)
+    )
+    return [
+        PendingActivationOut(
+            device_id=a.device_id, client_id=a.client_id, created_at=a.created_at
+        )
+        for a in result.scalars().all()
+    ]
 
 
 @router.post("/claim", response_model=DeviceClaimOut)

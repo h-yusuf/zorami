@@ -139,6 +139,13 @@ async def _build_pipeline(mcp: McpClient, device_id: str) -> Pipeline:
 
     system_prompt = (agent["system_prompt"] if agent else _DEFAULT_SYSTEM_PROMPT) + _context_note()
 
+    providers_used = {
+        "stt": stt_cfg["provider_code"] if stt_cfg else "groq",
+        "llm": llm_cfg["provider_code"] if llm_cfg else "omnirouter",
+        "tts": tts_cfg["provider_code"] if tts_cfg else "piper",
+        "search": search_cfg["provider_code"] if search_cfg else "langsearch",
+    }
+
     return Pipeline(
         stt=stt,
         llm=llm,
@@ -149,6 +156,7 @@ async def _build_pipeline(mcp: McpClient, device_id: str) -> Pipeline:
         mcp=mcp,
         max_tokens=(agent["max_tokens"] if agent else 160),
         temperature=(agent["temperature"] if agent else 0.7),
+        providers_used=providers_used,
     )
 
 
@@ -292,6 +300,8 @@ async def device_websocket(
                                         session_id=session.session_id,
                                         user_text=stt_text,
                                         assistant_text=" ".join(assistant_text_parts),
+                                        provider_used=pipeline.last_provider_used,
+                                        latency_ms=pipeline.last_latency_ms,
                                     )
                                 await websocket.send_text(
                                     json.dumps(
@@ -333,7 +343,15 @@ async def device_websocket(
             mcp_initialize_task.cancel()
 
 
-async def _log_turn(*, device_id: str, session_id: str, user_text: str, assistant_text: str) -> None:
+async def _log_turn(
+    *,
+    device_id: str,
+    session_id: str,
+    user_text: str,
+    assistant_text: str,
+    provider_used: dict[str, str] | None = None,
+    latency_ms: dict[str, int] | None = None,
+) -> None:
     import uuid
 
     from sqlalchemy import select
@@ -378,6 +396,8 @@ async def _log_turn(*, device_id: str, session_id: str, user_text: str, assistan
                 conversation_id=conversation.id,
                 role="assistant",
                 text=assistant_text,
+                provider_used=provider_used or None,
+                latency_ms=latency_ms or None,
             )
         )
         await db_session.commit()

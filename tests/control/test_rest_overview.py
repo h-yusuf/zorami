@@ -3,7 +3,7 @@ import uuid
 from datetime import datetime, timedelta, timezone
 
 from app.core.db import get_sessionmaker
-from app.core.models import Agent, Conversation, Device, Message
+from app.core.models import Agent, Conversation, Device, Message, ProviderCred
 
 _mac_counter = itertools.count(200)
 
@@ -117,6 +117,59 @@ async def test_overview_counts(client, auth_headers, seeded_owner):
     assert data["agents_total"] == 1
     assert data["active_conversations"] == 1
     assert data["turns_today"] == 2
+
+
+async def test_overview_provider_p50_computed_from_real_message_latency(
+    client, auth_headers, seeded_owner
+):
+    session_maker = get_sessionmaker()
+    owner_uuid = uuid.UUID(seeded_owner["owner_id"])
+    async with session_maker() as session:
+        device = Device(
+            owner_id=owner_uuid, device_id="AA:BB:CC:DD:EE:F9", client_id="c", token_hash="h"
+        )
+        provider = ProviderCred(
+            owner_id=owner_uuid,
+            kind="stt",
+            provider_code="groq",
+            config={},
+            secret_encrypted="enc",
+            secret_last4="1234",
+        )
+        session.add_all([device, provider])
+        await session.flush()
+
+        conv = Conversation(owner_id=owner_uuid, device_id=device.id, session_id="sess-p50")
+        session.add(conv)
+        await session.flush()
+
+        session.add_all(
+            [
+                Message(
+                    owner_id=owner_uuid,
+                    conversation_id=conv.id,
+                    role="assistant",
+                    text="a",
+                    latency_ms={"stt": 400, "llm": 700, "tts": 200, "total": 1300},
+                ),
+                Message(
+                    owner_id=owner_uuid,
+                    conversation_id=conv.id,
+                    role="assistant",
+                    text="b",
+                    latency_ms={"stt": 600, "llm": 900, "tts": 300, "total": 1800},
+                ),
+            ]
+        )
+        await session.commit()
+
+    r = client.get("/api/overview", headers=auth_headers)
+    assert r.status_code == 200
+    data = r.json()
+    stt_provider = next(p for p in data["providers"] if p["kind"] == "stt")
+    assert stt_provider["provider_code"] == "groq"
+    assert stt_provider["p50_ms"] == 500  # median(400, 600)
+    assert data["p50_latency_ms"] == 1550  # median(1300, 1800)
 
 
 async def test_overview_scoped_to_owner(client, auth_headers, other_auth_headers, seeded_owner):

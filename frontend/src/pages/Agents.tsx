@@ -4,15 +4,11 @@ import {
   useCreateAgent,
   useDeleteAgent,
   useUpdateAgent,
+  useDevices,
+  useProviders,
   type Agent,
   type AgentCreateInput,
 } from "../api/hooks";
-
-const TOOL_OPTIONS = [
-  { value: "websearch", label: "Pencarian Web" },
-  { value: "device_control", label: "Kontrol Device (MCP)" },
-  { value: "camera", label: "Kamera" },
-];
 
 const EMOTION_OPTIONS = [
   { value: "flat", label: "Datar" },
@@ -61,7 +57,7 @@ const DEFAULT_FORM: FormState = {
   system_prompt: "",
   llm_model: "gpt-4o-mini",
   temperature: 0.7,
-  max_tokens: 256,
+  max_tokens: 160,
   tts_provider: "piper",
   tts_voice: "id_ID",
   emotion_level: "medium",
@@ -70,8 +66,51 @@ const DEFAULT_FORM: FormState = {
   chat_log_level: 1,
 };
 
+function relativeTime(iso: string): string {
+  const diffMs = Date.now() - new Date(iso).getTime();
+  const min = Math.floor(diffMs / 60000);
+  if (min < 1) return "baru saja";
+  if (min < 60) return `${min} menit lalu`;
+  const hr = Math.floor(min / 60);
+  if (hr < 24) return `${hr} jam lalu`;
+  const day = Math.floor(hr / 24);
+  return `${day} hari lalu`;
+}
+
+function Lbl({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="text-[10.5px] font-semibold uppercase tracking-[0.1em] text-text-dim">
+      {children}
+    </div>
+  );
+}
+
+function Hint({ children }: { children: React.ReactNode }) {
+  return <p className="text-[11.5px] leading-relaxed text-text-dim">{children}</p>;
+}
+
+function Toggle({ on, onClick }: { on: boolean; onClick: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`relative h-[19px] w-[34px] shrink-0 rounded-full transition-colors ${
+        on ? "bg-mint" : "bg-[#35322C]"
+      }`}
+    >
+      <span
+        className={`absolute top-[2px] h-[15px] w-[15px] rounded-full transition-all ${
+          on ? "right-[2px] bg-text" : "left-[2px] bg-text-dim"
+        }`}
+      />
+    </button>
+  );
+}
+
 export default function Agents() {
   const { data: agents, isLoading, isError } = useAgents();
+  const { data: devices } = useDevices();
+  const { data: providers } = useProviders();
   const createAgent = useCreateAgent();
   const updateAgent = useUpdateAgent();
   const deleteAgent = useDeleteAgent();
@@ -122,6 +161,14 @@ export default function Agents() {
     }
   }
 
+  async function handleDuplicate() {
+    if (!selected) return;
+    const body: AgentCreateInput = { ...agentToForm(selected), name: `${selected.name} (salinan)` };
+    const created = await createAgent.mutateAsync(body);
+    setIsCreating(false);
+    setSelectedId(created.id);
+  }
+
   async function handleDelete() {
     if (!selectedId) return;
     if (!window.confirm("Hapus agent ini? Tindakan tidak bisa dibatalkan.")) return;
@@ -132,234 +179,363 @@ export default function Agents() {
   const isSaving = createAgent.isPending || updateAgent.isPending;
   const showEditor = isCreating || selected !== null;
 
-  return (
-    <div className="flex flex-col gap-4">
-      <div className="flex items-center justify-between">
-        <h1 className="text-lg font-semibold text-text">Agents</h1>
-        <button
-          onClick={startCreate}
-          className="rounded-md bg-amber px-3 py-1.5 text-[12px] font-semibold text-bg hover:bg-amber-light"
-        >
-          + Agent Baru
-        </button>
-      </div>
+  const searchProvider = (providers ?? []).find((p) => p.kind === "search");
+  const visionProvider = (providers ?? []).find((p) => p.kind === "vision");
 
-      <div className="flex gap-4">
-        {/* List */}
-        <div className="w-64 shrink-0 rounded-md border border-border bg-surface">
-          {isLoading && <p className="p-4 text-[12px] text-text-dim">Memuat...</p>}
-          {isError && <p className="p-4 text-[12px] text-danger">Gagal memuat agent.</p>}
-          {agents && agents.length === 0 && (
-            <p className="p-4 text-[12px] text-text-dim">Belum ada agent.</p>
-          )}
-          <ul className="flex flex-col">
-            {agents?.map((agent) => (
-              <li key={agent.id}>
-                <button
-                  onClick={() => selectAgent(agent.id)}
-                  className={`w-full border-b border-border px-4 py-3 text-left text-[13px] ${
-                    selectedId === agent.id && !isCreating
-                      ? "bg-surface-alt text-text"
-                      : "text-text-secondary hover:bg-surface-alt"
-                  }`}
-                >
-                  <div className="font-medium">{agent.name}</div>
-                  <div className="mt-0.5 font-mono text-[11px] text-text-dim">
-                    {agent.llm_model}
-                  </div>
-                </button>
-              </li>
-            ))}
-          </ul>
+  function devicesFor(agentId: string) {
+    return (devices ?? []).filter((d) => d.agent_id === agentId);
+  }
+
+  return (
+    <div className="flex h-full gap-4">
+      {/* List */}
+      <div className="flex w-[262px] shrink-0 flex-col rounded-md border border-border bg-[#1A1917]">
+        <div className="flex flex-col gap-[11px] border-b border-border px-4 pb-3 pt-4">
+          <div className="flex items-center justify-between">
+            <div className="text-[14px] font-semibold text-text">Agents</div>
+            <div className="font-mono text-[10.5px] text-text-dim">{agents?.length ?? 0}</div>
+          </div>
+          <button
+            onClick={startCreate}
+            className="flex items-center justify-center gap-[7px] rounded-[3px] bg-amber px-[11px] py-[7px] text-[12.5px] font-semibold text-bg hover:bg-amber-light"
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
+              <path d="M12 5v14M5 12h14" />
+            </svg>
+            Agent baru
+          </button>
         </div>
 
-        {/* Editor */}
-        <div className="flex-1 rounded-md border border-border bg-surface p-5">
-          {!showEditor && (
-            <p className="text-[12px] text-text-dim">
-              Pilih agent di sebelah kiri, atau buat agent baru.
-            </p>
-          )}
+        {isLoading && <p className="p-4 text-[12px] text-text-dim">Memuat...</p>}
+        {isError && <p className="p-4 text-[12px] text-danger">Gagal memuat agent.</p>}
+        {agents && agents.length === 0 && (
+          <p className="p-4 text-[12px] text-text-dim">Belum ada agent.</p>
+        )}
 
-          {showEditor && (
-            <div className="flex flex-col gap-6">
-              {/* Identitas & Persona */}
-              <section className="flex flex-col gap-3">
-                <h2 className="text-[13px] font-semibold text-text">Identitas & Persona</h2>
-                <label className="flex flex-col gap-1">
-                  <span className="text-[11px] font-medium uppercase text-text-dim">Nama</span>
-                  <input
-                    value={form.name}
-                    onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
-                    className="rounded border border-border bg-bg px-3 py-2 text-[13px] text-text"
-                  />
-                </label>
-                <label className="flex flex-col gap-1">
+        <div className="flex flex-col overflow-y-auto">
+          {agents?.map((agent) => {
+            const isActive = selectedId === agent.id && !isCreating;
+            const assigned = devicesFor(agent.id);
+            const anyOffline = assigned.some((d) => !d.online);
+            return (
+              <button
+                key={agent.id}
+                onClick={() => selectAgent(agent.id)}
+                className={`flex flex-col gap-[5px] border-b border-[#26241F] px-4 py-[13px] text-left ${
+                  isActive ? "border-l-[3px] border-l-amber bg-[#221F1B]" : "border-l-[3px] border-l-transparent hover:bg-surface-alt"
+                }`}
+              >
+                <div className={`text-[13.5px] ${isActive ? "font-semibold text-text" : "font-medium text-[#D6D1C8]"}`}>
+                  {agent.name}
+                </div>
+                <div className="line-clamp-1 text-[11.5px] leading-relaxed text-text-dim">
+                  {agent.system_prompt || "Belum ada system prompt"}
+                </div>
+                <div className="mt-[2px] flex flex-wrap gap-[5px]">
+                  {assigned.length > 0 ? (
+                    <span className="rounded-[2px] border border-[#2F4033] bg-[#1F241F] px-[5px] py-[2px] font-mono text-[9.5px] text-[#8FD6BC]">
+                      {assigned.length} device
+                    </span>
+                  ) : (
+                    <span className="rounded-[2px] border border-border bg-[#1D1C19] px-[5px] py-[2px] font-mono text-[9.5px] text-text-dim">
+                      belum ada device
+                    </span>
+                  )}
+                  {agent.memory_enabled && (
+                    <span className="rounded-[2px] border border-border bg-[#221F1B] px-[5px] py-[2px] font-mono text-[9.5px] text-text-secondary">
+                      memori on
+                    </span>
+                  )}
+                  {anyOffline && (
+                    <span className="rounded-[2px] border border-border bg-[#1D1C19] px-[5px] py-[2px] font-mono text-[9.5px] text-text-dim">
+                      device offline
+                    </span>
+                  )}
+                </div>
+              </button>
+            );
+          })}
+        </div>
+
+        <div className="grow" />
+        <div className="border-t border-border px-4 py-[13px]">
+          <Hint>Satu device dipasangkan ke satu agent. Ganti agent tidak perlu reboot device.</Hint>
+        </div>
+      </div>
+
+      {/* Editor */}
+      <div className="flex flex-1 flex-col overflow-hidden rounded-md border border-border bg-surface">
+        {!showEditor && (
+          <p className="p-5 text-[12px] text-text-dim">
+            Pilih agent di sebelah kiri, atau buat agent baru.
+          </p>
+        )}
+
+        {showEditor && (
+          <>
+            <div className="flex items-center justify-between border-b border-border px-5 py-4">
+              <div className="flex flex-col gap-[2px]">
+                <div className="text-[17px] font-semibold text-text">
+                  {isCreating ? "Agent baru" : selected?.name}
+                </div>
+                {!isCreating && selected && (
+                  <div className="font-mono text-[10.5px] text-text-dim">
+                    agent_{selected.id.slice(0, 8)} &middot; diubah {relativeTime(selected.updated_at)}
+                  </div>
+                )}
+              </div>
+              <div className="flex items-center gap-[9px]">
+                {!isCreating && (
+                  <button
+                    onClick={handleDelete}
+                    disabled={deleteAgent.isPending}
+                    className="text-[12px] text-text-dim hover:text-danger disabled:opacity-50"
+                  >
+                    Hapus
+                  </button>
+                )}
+                {!isCreating && (
+                  <button
+                    onClick={handleDuplicate}
+                    disabled={createAgent.isPending}
+                    className="rounded-[3px] border border-[#35322C] px-[13px] py-[7px] text-[12.5px] text-text-secondary hover:bg-surface-alt disabled:opacity-50"
+                  >
+                    Duplikat
+                  </button>
+                )}
+                <button
+                  onClick={handleSave}
+                  disabled={isSaving || !form.name}
+                  className="rounded-[3px] bg-amber px-[15px] py-[7px] text-[12.5px] font-semibold text-bg hover:bg-amber-light disabled:opacity-50"
+                >
+                  {isCreating ? "Buat Agent" : "Simpan"}
+                </button>
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-4 overflow-y-auto p-5">
+              {/* Identitas & persona */}
+              <div className="flex flex-col gap-[14px] rounded-md border border-border bg-[#1F1E1B] p-[18px]">
+                <div className="text-[13.5px] font-semibold text-text">Identitas &amp; persona</div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="flex flex-col gap-[5px]">
+                    <Lbl>Nama agent</Lbl>
+                    <input
+                      value={form.name}
+                      onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
+                      className="rounded-[3px] border border-[#35322C] bg-bg px-[11px] py-[9px] text-[13px] text-text"
+                    />
+                  </div>
+                  <div className="flex flex-col gap-[5px]">
+                    <Lbl>Nama panggilan (wake word)</Lbl>
+                    <div className="flex items-center gap-2 rounded-[3px] border border-[#35322C] bg-bg px-[11px] py-[9px] text-[13px] text-text-secondary">
+                      Zora
+                      <span className="font-mono text-[11px] text-text-dim">
+                        &mdash; dari firmware, read-only
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex flex-col gap-[5px]">
                   <div className="flex items-center justify-between">
-                    <span className="text-[11px] font-medium uppercase text-text-dim">
-                      System Prompt
-                    </span>
-                    <span className="font-mono text-[11px] text-text-dim">
-                      {form.system_prompt.length} karakter
-                    </span>
+                    <Lbl>System prompt</Lbl>
+                    <div className="font-mono text-[10.5px] text-text-dim">
+                      {form.system_prompt.length} / 4000 karakter
+                    </div>
                   </div>
                   <textarea
                     value={form.system_prompt}
-                    onChange={(e) =>
-                      setForm((f) => ({ ...f, system_prompt: e.target.value }))
-                    }
-                    rows={5}
-                    className="rounded border border-border bg-bg px-3 py-2 text-[13px] text-text"
+                    onChange={(e) => setForm((f) => ({ ...f, system_prompt: e.target.value }))}
+                    rows={4}
+                    maxLength={4000}
+                    className="rounded-[3px] border border-[#35322C] bg-bg px-[11px] py-[9px] text-[13px] leading-relaxed text-text"
                   />
-                </label>
-              </section>
-
-              {/* Suara */}
-              <section className="flex flex-col gap-3">
-                <h2 className="text-[13px] font-semibold text-text">Suara</h2>
-                <div className="grid grid-cols-2 gap-3">
-                  <label className="flex flex-col gap-1">
-                    <span className="text-[11px] font-medium uppercase text-text-dim">
-                      TTS Provider
-                    </span>
-                    <input
-                      value={form.tts_provider}
-                      onChange={(e) =>
-                        setForm((f) => ({ ...f, tts_provider: e.target.value }))
-                      }
-                      className="rounded border border-border bg-bg px-3 py-2 text-[13px] text-text"
-                    />
-                  </label>
-                  <label className="flex flex-col gap-1">
-                    <span className="text-[11px] font-medium uppercase text-text-dim">
-                      TTS Voice
-                    </span>
-                    <input
-                      value={form.tts_voice}
-                      onChange={(e) => setForm((f) => ({ ...f, tts_voice: e.target.value }))}
-                      className="rounded border border-border bg-bg px-3 py-2 text-[13px] text-text"
-                    />
-                  </label>
-                  <label className="flex flex-col gap-1">
-                    <span className="text-[11px] font-medium uppercase text-text-dim">
-                      Level Emosi
-                    </span>
-                    <select
-                      value={form.emotion_level}
-                      onChange={(e) =>
-                        setForm((f) => ({ ...f, emotion_level: e.target.value }))
-                      }
-                      className="rounded border border-border bg-bg px-3 py-2 text-[13px] text-text"
-                    >
-                      {EMOTION_OPTIONS.map((opt) => (
-                        <option key={opt.value} value={opt.value}>
-                          {opt.label}
-                        </option>
-                      ))}
-                    </select>
-                  </label>
+                  <Hint>
+                    Jawaban dibacakan TTS, bukan dibaca. Prompt yang minta output pendek dan tanpa
+                    markdown itu bedanya antara terasa alami dan terasa robot.
+                  </Hint>
                 </div>
-              </section>
+              </div>
 
-              {/* Model */}
-              <section className="flex flex-col gap-3">
-                <h2 className="text-[13px] font-semibold text-text">Model</h2>
-                <div className="grid grid-cols-3 gap-3">
-                  <label className="flex flex-col gap-1">
-                    <span className="text-[11px] font-medium uppercase text-text-dim">
-                      LLM Model
-                    </span>
+              <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+                {/* Suara */}
+                <div className="flex flex-col gap-[13px] rounded-md border border-border bg-[#1F1E1B] p-[18px]">
+                  <div className="text-[13.5px] font-semibold text-text">Suara</div>
+                  <div className="grid grid-cols-2 gap-[10px]">
+                    <div className="flex flex-col gap-[5px]">
+                      <Lbl>TTS Provider</Lbl>
+                      <input
+                        value={form.tts_provider}
+                        onChange={(e) => setForm((f) => ({ ...f, tts_provider: e.target.value }))}
+                        className="rounded-[3px] border border-[#35322C] bg-bg px-[11px] py-[9px] text-[13px] text-text"
+                      />
+                    </div>
+                    <div className="flex flex-col gap-[5px]">
+                      <Lbl>TTS Voice</Lbl>
+                      <input
+                        value={form.tts_voice}
+                        onChange={(e) => setForm((f) => ({ ...f, tts_voice: e.target.value }))}
+                        className="rounded-[3px] border border-[#35322C] bg-bg px-[11px] py-[9px] text-[13px] text-text"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="h-px bg-border" />
+
+                  <div className="flex flex-col gap-[5px]">
+                    <Lbl>Ekspresi di layar device</Lbl>
+                    <Hint>
+                      Bridge mengirim <span className="font-mono text-text-secondary">type: llm</span>{" "}
+                      + emotion, device menampilkan wajahnya. Pilih seberapa ekspresif.
+                    </Hint>
+                    <div className="mt-[3px] flex gap-[6px]">
+                      {EMOTION_OPTIONS.map((opt) => (
+                        <button
+                          key={opt.value}
+                          onClick={() => setForm((f) => ({ ...f, emotion_level: opt.value }))}
+                          className={`rounded-[3px] px-[10px] py-[5px] text-[11.5px] font-medium ${
+                            form.emotion_level === opt.value
+                              ? "bg-[#3A342A] text-amber"
+                              : "border border-[#35322C] text-text-secondary hover:bg-surface-alt"
+                          }`}
+                        >
+                          {opt.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Model */}
+                <div className="flex flex-col gap-[13px] rounded-md border border-border bg-[#1F1E1B] p-[18px]">
+                  <div className="text-[13.5px] font-semibold text-text">Model</div>
+                  <div className="flex flex-col gap-[5px]">
+                    <Lbl>LLM</Lbl>
                     <input
                       value={form.llm_model}
-                      onChange={(e) =>
-                        setForm((f) => ({ ...f, llm_model: e.target.value }))
-                      }
-                      className="rounded border border-border bg-bg px-3 py-2 text-[13px] text-text"
+                      onChange={(e) => setForm((f) => ({ ...f, llm_model: e.target.value }))}
+                      className="rounded-[3px] border border-[#35322C] bg-bg px-[11px] py-[9px] text-[13px] text-text"
                     />
-                  </label>
-                  <label className="flex flex-col gap-1">
-                    <span className="text-[11px] font-medium uppercase text-text-dim">
-                      Temperature
-                    </span>
-                    <input
-                      type="number"
-                      step={0.1}
-                      min={0}
-                      max={2}
-                      value={form.temperature}
-                      onChange={(e) =>
-                        setForm((f) => ({ ...f, temperature: Number(e.target.value) }))
-                      }
-                      className="rounded border border-border bg-bg px-3 py-2 text-[13px] text-text"
-                    />
-                  </label>
-                  <label className="flex flex-col gap-1">
-                    <span className="text-[11px] font-medium uppercase text-text-dim">
-                      Max Tokens
-                    </span>
-                    <input
-                      type="number"
-                      min={1}
-                      value={form.max_tokens}
-                      onChange={(e) =>
-                        setForm((f) => ({ ...f, max_tokens: Number(e.target.value) }))
-                      }
-                      className="rounded border border-border bg-bg px-3 py-2 text-[13px] text-text"
-                    />
-                  </label>
+                    <Hint>Model diambil dari provider LLM milikmu di halaman Providers. Tiap agent boleh beda model.</Hint>
+                  </div>
+                  <div className="grid grid-cols-2 gap-[10px]">
+                    <div className="flex flex-col gap-[5px]">
+                      <Lbl>Temperature</Lbl>
+                      <input
+                        type="number"
+                        step={0.1}
+                        min={0}
+                        max={2}
+                        value={form.temperature}
+                        onChange={(e) => setForm((f) => ({ ...f, temperature: Number(e.target.value) }))}
+                        className="rounded-[3px] border border-[#35322C] bg-bg px-[11px] py-[9px] font-mono text-[13px] text-text"
+                      />
+                    </div>
+                    <div className="flex flex-col gap-[5px]">
+                      <Lbl>Batas token balasan</Lbl>
+                      <input
+                        type="number"
+                        min={1}
+                        value={form.max_tokens}
+                        onChange={(e) => setForm((f) => ({ ...f, max_tokens: Number(e.target.value) }))}
+                        className="rounded-[3px] border border-[#35322C] bg-bg px-[11px] py-[9px] font-mono text-[13px] text-text"
+                      />
+                    </div>
+                  </div>
+                  <Hint>
+                    Batas token rendah itu sengaja &mdash; jawaban panjang bikin TTS lama dan device
+                    terasa lambat.
+                  </Hint>
                 </div>
-              </section>
+              </div>
 
               {/* Tools */}
-              <section className="flex flex-col gap-3">
-                <h2 className="text-[13px] font-semibold text-text">Tools</h2>
-                <div className="flex flex-col gap-2">
-                  {TOOL_OPTIONS.map((opt) => (
-                    <label key={opt.value} className="flex items-center gap-2 text-[13px] text-text-secondary">
-                      <input
-                        type="checkbox"
-                        checked={form.tools_enabled.includes(opt.value)}
-                        onChange={() => toggleTool(opt.value)}
-                      />
-                      {opt.label}
-                    </label>
-                  ))}
+              <div className="flex flex-col gap-[13px] rounded-md border border-border bg-[#1F1E1B] p-[18px]">
+                <div className="flex items-center justify-between">
+                  <div className="text-[13.5px] font-semibold text-text">Tools</div>
+                  <div className="text-[11.5px] text-text-dim">Diekspos ke LLM sebagai function-call</div>
                 </div>
-                <p className="text-[11px] leading-relaxed text-text-dim">
-                  Catatan: tool berbahaya seperti <span className="font-mono">self.reboot</span> dan{" "}
-                  <span className="font-mono">self.upgrade_firmware</span> tidak pernah diekspos ke
-                  LLM, terlepas dari pengaturan di atas — bridge menyaringnya lewat allowlist.
-                </p>
-              </section>
+
+                <div className="flex items-center gap-[13px] border-t border-[#26241F] py-[11px]">
+                  <Toggle on={form.tools_enabled.includes("websearch")} onClick={() => toggleTool("websearch")} />
+                  <div className="flex grow flex-col gap-[3px]">
+                    <div className="text-[13px] font-medium text-text">Websearch</div>
+                    <Hint>
+                      LLM memutuskan sendiri kapan perlu cari. Provider:{" "}
+                      {searchProvider ? searchProvider.provider_code : "belum dikonfigurasi"}.
+                    </Hint>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-[13px] border-t border-[#26241F] py-[11px]">
+                  <Toggle
+                    on={form.tools_enabled.includes("device_control")}
+                    onClick={() => toggleTool("device_control")}
+                  />
+                  <div className="flex grow flex-col gap-[3px]">
+                    <div className="text-[13px] font-medium text-text">Kontrol device (MCP)</div>
+                    <Hint>
+                      Volume, kecerahan, tema, status device &mdash; ditemukan otomatis dari device
+                      lewat <span className="font-mono text-text-secondary">tools/list</span>.
+                    </Hint>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-[13px] border-t border-[#26241F] py-[11px]">
+                  <Toggle on={form.tools_enabled.includes("camera")} onClick={() => toggleTool("camera")} />
+                  <div className="flex grow flex-col gap-[3px]">
+                    <div className={`text-[13px] font-medium ${form.tools_enabled.includes("camera") ? "text-text" : "text-text-secondary"}`}>
+                      Kamera (jawab soal apa yang dilihat)
+                    </div>
+                    <Hint>
+                      Device kirim foto ke bridge, bridge yang menjalankan model vision. Butuh key
+                      provider vision.
+                    </Hint>
+                  </div>
+                  <div className="font-mono text-[10.5px] text-text-dim">
+                    {visionProvider ? visionProvider.provider_code : "key belum diisi"}
+                  </div>
+                </div>
+
+                <div className="mt-[2px] flex gap-[11px] rounded-[3px] bg-[#201C18] p-[13px]">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--color-amber)" strokeWidth="1.8" strokeLinecap="round" className="mt-px shrink-0">
+                    <rect x="4.5" y="10.5" width="15" height="9.5" rx="1.5" />
+                    <path d="M8 10.5V7a4 4 0 0 1 8 0v3.5" />
+                  </svg>
+                  <Hint>
+                    <span className="text-[#C9B48C]">
+                      Tool berbahaya device (<span className="font-mono">self.reboot</span>,{" "}
+                      <span className="font-mono">self.upgrade_firmware</span>) tidak pernah
+                      diekspos ke LLM &mdash; firmware tetap mau mengeksekusinya kalau dipanggil,
+                      jadi bridge yang memfilter. Hanya bisa dijalankan manual dari halaman Devices.
+                    </span>
+                  </Hint>
+                </div>
+              </div>
 
               {/* Memori */}
-              <section className="flex flex-col gap-3">
-                <h2 className="text-[13px] font-semibold text-text">Memori Jangka Panjang</h2>
-                <label className="flex items-center gap-2 text-[13px] text-text-secondary">
-                  <input
-                    type="checkbox"
-                    checked={form.memory_enabled}
-                    onChange={(e) =>
-                      setForm((f) => ({ ...f, memory_enabled: e.target.checked }))
-                    }
-                  />
-                  Aktifkan memori jangka panjang untuk agent ini
-                </label>
-              </section>
+              <div className="flex flex-col gap-[13px] rounded-md border border-border bg-[#1F1E1B] p-[18px]">
+                <div className="flex items-center justify-between">
+                  <div className="text-[13.5px] font-semibold text-text">Memori jangka panjang</div>
+                  <Toggle on={form.memory_enabled} onClick={() => setForm((f) => ({ ...f, memory_enabled: !f.memory_enabled }))} />
+                </div>
+                <Hint>
+                  Kalau aktif, bridge boleh menyimpan fakta tentang pemilik dan ringkasan
+                  percakapan lama untuk disuntik ke system prompt turn berikutnya. Penyimpanan
+                  faktanya sendiri belum tersedia di dashboard ini &mdash; toggle ini baru
+                  menyalakan flag di agent.
+                </Hint>
+              </div>
 
               {/* Log */}
-              <section className="flex flex-col gap-3">
-                <h2 className="text-[13px] font-semibold text-text">Chat Log</h2>
-                <label className="flex flex-col gap-1">
-                  <span className="text-[11px] font-medium uppercase text-text-dim">
-                    Level Penyimpanan Log
-                  </span>
+              <div className="flex flex-col gap-[10px] rounded-md border border-border bg-[#1F1E1B] p-[18px]">
+                <div className="text-[13.5px] font-semibold text-text">Chat log</div>
+                <div className="flex flex-col gap-[5px]">
+                  <Lbl>Level penyimpanan log</Lbl>
                   <select
                     value={form.chat_log_level}
-                    onChange={(e) =>
-                      setForm((f) => ({ ...f, chat_log_level: Number(e.target.value) }))
-                    }
-                    className="rounded border border-border bg-bg px-3 py-2 text-[13px] text-text"
+                    onChange={(e) => setForm((f) => ({ ...f, chat_log_level: Number(e.target.value) }))}
+                    className="rounded-[3px] border border-[#35322C] bg-bg px-[11px] py-[9px] text-[13px] text-text"
                   >
                     {CHAT_LOG_OPTIONS.map((opt) => (
                       <option key={opt.value} value={opt.value}>
@@ -367,30 +543,11 @@ export default function Agents() {
                       </option>
                     ))}
                   </select>
-                </label>
-              </section>
-
-              <div className="flex items-center gap-3 border-t border-border pt-4">
-                <button
-                  onClick={handleSave}
-                  disabled={isSaving || !form.name}
-                  className="rounded-md bg-amber px-4 py-2 text-[12px] font-semibold text-bg hover:bg-amber-light disabled:opacity-50"
-                >
-                  {isCreating ? "Buat Agent" : "Simpan Perubahan"}
-                </button>
-                {!isCreating && (
-                  <button
-                    onClick={handleDelete}
-                    disabled={deleteAgent.isPending}
-                    className="rounded-md border border-danger px-4 py-2 text-[12px] font-semibold text-danger hover:bg-danger/10 disabled:opacity-50"
-                  >
-                    Hapus Agent
-                  </button>
-                )}
+                </div>
               </div>
             </div>
-          )}
-        </div>
+          </>
+        )}
       </div>
     </div>
   );

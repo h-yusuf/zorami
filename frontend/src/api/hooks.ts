@@ -268,6 +268,20 @@ export function useDeleteDevice() {
   });
 }
 
+export interface PendingActivation {
+  device_id: string; // MAC
+  client_id: string;
+  created_at: string;
+}
+
+export function usePendingActivations() {
+  return useQuery({
+    queryKey: ["devices", "pending"],
+    queryFn: () => apiJson<PendingActivation[]>("/api/devices/pending"),
+    refetchInterval: 5000,
+  });
+}
+
 export function useClaimDevice() {
   const queryClient = useQueryClient();
   return useMutation({

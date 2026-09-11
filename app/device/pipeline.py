@@ -1,5 +1,6 @@
 import audioop
 import json
+import time
 from typing import TYPE_CHECKING, AsyncIterator, TypedDict
 
 from app.adapters.llm.base import LLMAdapter
@@ -55,6 +56,7 @@ class Pipeline:
         mcp: "McpClient | None" = None,
         max_tokens: int = 160,
         temperature: float = 0.7,
+        providers_used: dict[str, str] | None = None,
     ):
         self._stt = stt
         self._llm = llm
@@ -65,6 +67,13 @@ class Pipeline:
         self._mcp = mcp
         self._max_tokens = max_tokens
         self._temperature = temperature
+        self._providers_used = providers_used or {}
+        # Diisi tiap kali handle_utterance() jalan - dibaca ws.py setelah turn
+        # selesai buat nyimpen latensi per-stage yang SUNGGUHAN ke Message,
+        # bukan placeholder. Sebelumnya Message.latency_ms/provider_used tidak
+        # pernah ditulis sama sekali walau kolomnya sudah ada di schema.
+        self.last_latency_ms: dict[str, int] = {}
+        self.last_provider_used: dict[str, str] = {}
 
     async def _build_tool_schema(self) -> list[dict] | None:
         tools: list[dict] = []
@@ -87,7 +96,13 @@ class Pipeline:
         return tools or None
 
     async def handle_utterance(self, pcm_audio: bytes) -> AsyncIterator[OutgoingEvent]:
+        turn_start = time.monotonic()
+        self.last_latency_ms = {}
+        self.last_provider_used = dict(self._providers_used)
+
+        t0 = time.monotonic()
         stt_result = await self._stt.transcribe(pcm_audio, sample_rate=16000)
+        self.last_latency_ms["stt"] = int((time.monotonic() - t0) * 1000)
         yield OutgoingEvent(kind="stt", text=stt_result.text)
 
         messages = [
@@ -96,9 +111,11 @@ class Pipeline:
         ]
 
         tools = await self._build_tool_schema()
+        t0 = time.monotonic()
         llm_result = await self._llm.complete(
             messages=messages, tools=tools, max_tokens=self._max_tokens, temperature=self._temperature
         )
+        llm_elapsed = time.monotonic() - t0
 
         if llm_result.tool_calls:
             call = llm_result.tool_calls[0]
@@ -106,7 +123,9 @@ class Pipeline:
             args = json.loads(call["function"]["arguments"] or "{}")
 
             if tool_name == _SEARCH_TOOL_NAME and self._search is not None:
+                t0 = time.monotonic()
                 search_result = await self._search.search(args["query"], max_results=3)
+                self.last_latency_ms["search"] = int((time.monotonic() - t0) * 1000)
                 tool_content = "\n".join(
                     f"- {r['title']}: {r['snippet']}" for r in search_result.results
                 )
@@ -120,12 +139,22 @@ class Pipeline:
 
             messages.append({"role": "assistant", "content": None, "tool_calls": llm_result.tool_calls})
             messages.append({"role": "tool", "tool_call_id": call["id"], "content": tool_content})
+            t0 = time.monotonic()
             llm_result = await self._llm.complete(
                 messages=messages, max_tokens=self._max_tokens, temperature=self._temperature
             )
+            llm_elapsed += time.monotonic() - t0
+
+        self.last_latency_ms["llm"] = int(llm_elapsed * 1000)
 
         final_text = llm_result.text
+        t0 = time.monotonic()
         tts_result = await self._tts.synthesize(final_text, voice=self._voice)
+        self.last_latency_ms["tts"] = int((time.monotonic() - t0) * 1000)
+        # "total" berhenti di sini (audio pertama siap), bukan di akhir loop
+        # pengiriman frame - itu dipacer real-time jadi bukan latensi beneran,
+        # ini yang dimaksud "mulut ke telinga" di dashboard.
+        self.last_latency_ms["total"] = int((time.monotonic() - turn_start) * 1000)
 
         yield OutgoingEvent(kind="tts_start")
         yield OutgoingEvent(kind="tts_sentence", text=llm_result.text)

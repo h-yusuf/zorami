@@ -53,21 +53,33 @@ async def overview(
     )
     turns_today = turns_today_result.scalar_one()
 
-    # Simplified p50: pull latency_ms->>'total' values in Python instead of
+    # Simplified p50: pull latency_ms dict values in Python instead of
     # PERCENTILE_CONT (keeps this portable across the SQLite test DB too).
     latency_result = await db.execute(
         select(Message.latency_ms).where(
             Message.owner_id == owner_uuid, Message.latency_ms.is_not(None)
         )
     )
+    latencies = [row[0] for row in latency_result if isinstance(row[0], dict)]
+
     totals = []
-    for (latency,) in latency_result:
-        if isinstance(latency, dict) and "total" in latency:
+    for latency in latencies:
+        if "total" in latency:
             try:
                 totals.append(float(latency["total"]))
             except (TypeError, ValueError):
                 continue
     p50_latency_ms = int(statistics.median(totals)) if totals else 0
+
+    def _stage_p50(stage: str) -> int:
+        values = []
+        for latency in latencies:
+            if stage in latency:
+                try:
+                    values.append(float(latency[stage]))
+                except (TypeError, ValueError):
+                    continue
+        return int(statistics.median(values)) if values else 0
 
     providers_result = await db.execute(
         select(ProviderCred.kind, ProviderCred.provider_code).where(
@@ -75,7 +87,7 @@ async def overview(
         )
     )
     providers = [
-        {"kind": kind, "provider_code": provider_code, "p50_ms": 0}
+        {"kind": kind, "provider_code": provider_code, "p50_ms": _stage_p50(kind)}
         for kind, provider_code in providers_result
     ]
 

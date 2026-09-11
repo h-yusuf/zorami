@@ -60,6 +60,31 @@ async def test_handle_utterance_emits_events_in_order():
     assert kinds[-1] == "tts_stop"
 
 
+async def test_handle_utterance_records_real_stage_latency_and_providers():
+    pipeline = Pipeline(
+        stt=_FakeSTT(),
+        llm=_FakeLLM(),
+        tts=_FakeTTS(),
+        voice="id_ID-news-medium",
+        system_prompt="Kamu Zora, asisten suara.",
+        providers_used={"stt": "groq", "llm": "omnirouter", "tts": "piper", "search": "langsearch"},
+    )
+
+    [event async for event in pipeline.handle_utterance(pcm_audio=b"\x00" * 1000)]
+
+    assert pipeline.last_provider_used == {
+        "stt": "groq",
+        "llm": "omnirouter",
+        "tts": "piper",
+        "search": "langsearch",
+    }
+    assert set(pipeline.last_latency_ms.keys()) >= {"stt", "llm", "tts", "total"}
+    assert all(ms >= 0 for ms in pipeline.last_latency_ms.values())
+    assert pipeline.last_latency_ms["total"] >= (
+        pipeline.last_latency_ms["stt"] + pipeline.last_latency_ms["llm"] + pipeline.last_latency_ms["tts"]
+    )
+
+
 async def test_handle_utterance_includes_llm_text_as_sentence():
     pipeline = Pipeline(
         stt=_FakeSTT(),
