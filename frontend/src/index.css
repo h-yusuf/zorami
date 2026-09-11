@@ -1,20 +1,20 @@
 @import "tailwindcss";
 
 @theme {
-  --font-sans: "General Sans", system-ui, sans-serif;
+  --font-sans: "Archivo", system-ui, sans-serif;
   --font-mono: "IBM Plex Mono", ui-monospace, monospace;
 
-  --color-bg: #0b0d10;
-  --color-surface: #14171b;
-  --color-surface-alt: #1a1e23;
-  --color-border: #242932;
-  --color-text: #ecedf1;
-  --color-text-secondary: #8b93a1;
-  --color-text-dim: #565e6c;
-  --color-amber: #ff6a2e;
-  --color-amber-light: #ff8f5c;
-  --color-mint: #34d399;
-  --color-danger: #f1495c;
+  --color-bg: #171614;
+  --color-surface: #1f1e1b;
+  --color-surface-alt: #1b1a17;
+  --color-border: #302d28;
+  --color-text: #f2efe8;
+  --color-text-secondary: #a8a29a;
+  --color-text-dim: #6e6a63;
+  --color-amber: #e8a33d;
+  --color-amber-light: #f2be68;
+  --color-mint: #4fc3a1;
+  --color-danger: #e4674f;
 }
 
 body {
@@ -25,12 +25,13 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* Denyut status live di layar login - satu titik hidup, bukan dekorasi berulang. */
-@keyframes status-pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.35; }
+/* Bar sinyal ambient di layar login - merepresentasikan bridge yang "mendengar".
+   Tiap bar punya durasi/delay beda (lihat LoginForm.tsx) biar gak sinkron kaku. */
+@keyframes signal-bar {
+  0%, 100% { transform: scaleY(0.25); }
+  50% { transform: scaleY(1); }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .status-pulse { animation: none !important; opacity: 1; }
+  .signal-bar { animation: none !important; transform: scaleY(0.6); }
 }

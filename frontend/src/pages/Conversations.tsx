@@ -75,14 +75,14 @@ export default function Conversations() {
         <h1 className="text-lg font-semibold text-text">Percakapan</h1>
       </div>
 
-      <div className="flex flex-wrap items-end gap-3 rounded-xl border border-border bg-surface p-4">
+      <div className="flex flex-wrap items-end gap-3 rounded-md border border-border bg-surface p-4">
         <label className="flex flex-col gap-1">
           <span className="text-[11px] font-medium uppercase text-text-dim">Cari judul</span>
           <input
             value={qInput}
             onChange={(e) => setQInput(e.target.value)}
             placeholder="cari judul percakapan..."
-            className="w-56 rounded-lg border border-border bg-bg px-3 py-2 text-[13px] text-text"
+            className="w-56 rounded border border-border bg-bg px-3 py-2 text-[13px] text-text"
           />
         </label>
         <label className="flex flex-col gap-1">
@@ -90,7 +90,7 @@ export default function Conversations() {
           <select
             value={deviceId}
             onChange={(e) => setDeviceId(e.target.value)}
-            className="w-48 rounded-lg border border-border bg-bg px-3 py-2 text-[13px] text-text"
+            className="w-48 rounded border border-border bg-bg px-3 py-2 text-[13px] text-text"
           >
             <option value="">Semua device</option>
             {(devices ?? []).map((d) => (
@@ -106,7 +106,7 @@ export default function Conversations() {
             type="date"
             value={dateFrom}
             onChange={(e) => setDateFrom(e.target.value)}
-            className="rounded-lg border border-border bg-bg px-3 py-2 text-[13px] text-text"
+            className="rounded border border-border bg-bg px-3 py-2 text-[13px] text-text"
           />
         </label>
         <label className="flex flex-col gap-1">
@@ -115,7 +115,7 @@ export default function Conversations() {
             type="date"
             value={dateTo}
             onChange={(e) => setDateTo(e.target.value)}
-            className="rounded-lg border border-border bg-bg px-3 py-2 text-[13px] text-text"
+            className="rounded border border-border bg-bg px-3 py-2 text-[13px] text-text"
           />
         </label>
         <p className="text-[11px] text-text-dim">
@@ -125,7 +125,7 @@ export default function Conversations() {
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-[380px_1fr]">
         {/* List kiri */}
-        <div className="rounded-xl border border-border bg-surface">
+        <div className="rounded-md border border-border bg-surface">
           {isLoading && <p className="p-4 text-[12px] text-text-dim">Memuat...</p>}
           {isError && <p className="p-4 text-[12px] text-danger">Gagal memuat percakapan.</p>}
           {conversations && conversations.length === 0 && (
@@ -144,7 +144,7 @@ export default function Conversations() {
                   <span className="text-[13px] font-medium text-text">
                     {c.title ?? "(tanpa judul)"}
                   </span>
-                  <span className="rounded-lg border border-border px-1.5 py-0.5 text-[10px] text-text-dim">
+                  <span className="rounded border border-border px-1.5 py-0.5 text-[10px] text-text-dim">
                     {c.turn_count} pesan
                   </span>
                 </div>
@@ -156,7 +156,7 @@ export default function Conversations() {
         </div>
 
         {/* Detail kanan */}
-        <div className="rounded-xl border border-border bg-surface p-5">
+        <div className="rounded-md border border-border bg-surface p-5">
           {!selectedId && (
             <p className="text-[12px] text-text-dim">Pilih percakapan di sebelah kiri untuk melihat transkrip.</p>
           )}
@@ -175,7 +175,7 @@ export default function Conversations() {
                 <div className="flex gap-2">
                   <button
                     onClick={handleExport}
-                    className="rounded-lg border border-border px-3 py-1.5 text-[11px] font-semibold text-text-secondary hover:bg-surface-alt"
+                    className="rounded border border-border px-3 py-1.5 text-[11px] font-semibold text-text-secondary hover:bg-surface-alt"
                   >
                     Ekspor JSON
                   </button>
@@ -184,13 +184,13 @@ export default function Conversations() {
                       <button
                         onClick={() => handleDelete(detail.id)}
                         disabled={deleteConversation.isPending}
-                        className="rounded-lg bg-danger px-3 py-1.5 text-[11px] font-semibold text-white hover:bg-danger/80 disabled:opacity-50"
+                        className="rounded bg-danger px-3 py-1.5 text-[11px] font-semibold text-white hover:bg-danger/80 disabled:opacity-50"
                       >
                         Yakin Hapus?
                       </button>
                       <button
                         onClick={() => setConfirmDeleteId(null)}
-                        className="rounded-lg border border-border px-3 py-1.5 text-[11px] font-semibold text-text-secondary hover:bg-surface-alt"
+                        className="rounded border border-border px-3 py-1.5 text-[11px] font-semibold text-text-secondary hover:bg-surface-alt"
                       >
                         Batal
                       </button>
@@ -198,7 +198,7 @@ export default function Conversations() {
                   ) : (
                     <button
                       onClick={() => setConfirmDeleteId(detail.id)}
-                      className="rounded-lg border border-danger px-3 py-1.5 text-[11px] font-semibold text-danger hover:bg-danger/10"
+                      className="rounded border border-danger px-3 py-1.5 text-[11px] font-semibold text-danger hover:bg-danger/10"
                     >
                       Hapus
                     </button>
@@ -211,7 +211,7 @@ export default function Conversations() {
                 {detail.messages.map((m) => (
                   <div
                     key={m.id}
-                    className={`max-w-[85%] rounded-xl p-3 text-[13px] ${
+                    className={`max-w-[85%] rounded-md p-3 text-[13px] ${
                       m.role === "user"
                         ? "self-start border border-border bg-bg text-text"
                         : "self-end border border-amber/30 bg-amber/10 text-text"

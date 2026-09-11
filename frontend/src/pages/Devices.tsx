@@ -73,7 +73,7 @@ export default function Devices() {
         <h1 className="text-lg font-semibold text-text">Devices & Pairing</h1>
       </div>
 
-      <div className="rounded-xl border border-border bg-surface p-5">
+      <div className="rounded-md border border-border bg-surface p-5">
         <h2 className="mb-1 text-[13px] font-semibold text-text">Klaim Device Baru</h2>
         <p className="mb-3 text-[12px] text-text-dim">
           Masukkan kode 6 karakter yang tampil di layar device.
@@ -84,12 +84,12 @@ export default function Devices() {
             onChange={(e) => setClaimCode(e.target.value.toUpperCase())}
             maxLength={6}
             placeholder="ABC234"
-            className="w-40 rounded-lg border border-border bg-bg px-3 py-2 font-mono text-[16px] tracking-widest text-text"
+            className="w-40 rounded border border-border bg-bg px-3 py-2 font-mono text-[16px] tracking-widest text-text"
           />
           <button
             onClick={handleClaim}
             disabled={claimDevice.isPending || claimCode.trim().length !== 6}
-            className="rounded-lg bg-amber px-4 py-2 text-[12px] font-semibold text-bg hover:bg-amber-light disabled:opacity-50"
+            className="rounded-md bg-amber px-4 py-2 text-[12px] font-semibold text-bg hover:bg-amber-light disabled:opacity-50"
           >
             Klaim
           </button>
@@ -101,7 +101,7 @@ export default function Devices() {
       {isLoading && <p className="text-[12px] text-text-dim">Memuat...</p>}
       {isError && <p className="text-[12px] text-danger">Gagal memuat devices.</p>}
 
-      <div className="rounded-xl border border-border bg-surface">
+      <div className="rounded-md border border-border bg-surface">
         <table className="w-full text-left text-[12px]">
           <thead>
             <tr className="border-b border-border text-text-dim">
@@ -126,7 +126,7 @@ export default function Devices() {
                 <td className="px-4 py-2 text-text-dim">{d.firmware_version ?? "-"}</td>
                 <td className="px-4 py-2">
                   <span
-                    className={`rounded-full border px-2 py-0.5 text-[10px] font-semibold ${
+                    className={`rounded border px-1.5 py-0.5 text-[10px] font-semibold ${
                       d.online
                         ? "border-green-500/30 bg-green-500/10 text-green-500"
                         : "border-border bg-surface-alt text-text-dim"
@@ -141,7 +141,7 @@ export default function Devices() {
                       e.stopPropagation();
                       setSelectedId(d.id);
                     }}
-                    className="rounded-lg border border-border px-2 py-1 text-[11px] font-semibold text-text-secondary hover:bg-surface-alt"
+                    className="rounded border border-border px-2 py-1 text-[11px] font-semibold text-text-secondary hover:bg-surface-alt"
                   >
                     Detail
                   </button>
@@ -160,7 +160,7 @@ export default function Devices() {
       </div>
 
       {selected && (
-        <div className="rounded-xl border border-border bg-surface p-5">
+        <div className="rounded-md border border-border bg-surface p-5">
           <div className="mb-3 flex items-center justify-between">
             <h2 className="text-[13px] font-semibold text-text">
               Detail: {selected.alias ?? selected.device_id}
@@ -205,7 +205,7 @@ export default function Devices() {
                 value={selected.agent_id ?? ""}
                 onChange={(e) => handleAgentChange(selected, e.target.value)}
                 disabled={updateDevice.isPending}
-                className="w-64 rounded-lg border border-border bg-bg px-3 py-2 text-[13px] text-text"
+                className="w-64 rounded border border-border bg-bg px-3 py-2 text-[13px] text-text"
               >
                 <option value="">— Belum ada agent —</option>
                 {(agents ?? []).map((a) => (
@@ -229,7 +229,7 @@ export default function Devices() {
 
           <div className="mt-4 border-t border-border pt-4">
             {confirmDeleteId === selected.id ? (
-              <div className="rounded-lg border border-danger bg-danger/10 p-3">
+              <div className="rounded border border-danger bg-danger/10 p-3">
                 <p className="mb-2 text-[12px] text-text">
                   Yakin lepas device ini dari akun? Baris device (termasuk token koneksinya) akan
                   dihapus permanen — device perlu diklaim ulang lewat kode aktivasi baru untuk
@@ -242,13 +242,13 @@ export default function Devices() {
                   <button
                     onClick={() => handleDelete(selected.id)}
                     disabled={deleteDevice.isPending}
-                    className="rounded-lg bg-danger px-3 py-1.5 text-[11px] font-semibold text-white hover:bg-danger/80 disabled:opacity-50"
+                    className="rounded bg-danger px-3 py-1.5 text-[11px] font-semibold text-white hover:bg-danger/80 disabled:opacity-50"
                   >
                     Ya, Lepas Device
                   </button>
                   <button
                     onClick={() => setConfirmDeleteId(null)}
-                    className="rounded-lg border border-border px-3 py-1.5 text-[11px] font-semibold text-text-secondary hover:bg-surface-alt"
+                    className="rounded border border-border px-3 py-1.5 text-[11px] font-semibold text-text-secondary hover:bg-surface-alt"
                   >
                     Batal
                   </button>
@@ -257,7 +257,7 @@ export default function Devices() {
             ) : (
               <button
                 onClick={() => setConfirmDeleteId(selected.id)}
-                className="rounded-lg border border-danger px-3 py-1.5 text-[11px] font-semibold text-danger hover:bg-danger/10"
+                className="rounded border border-danger px-3 py-1.5 text-[11px] font-semibold text-danger hover:bg-danger/10"
               >
                 Lepas dari Akun
               </button>
