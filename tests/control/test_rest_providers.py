@@ -105,6 +105,72 @@ def test_test_connection_reports_failure_without_crashing(client, auth_headers, 
     assert "401" in body["message"]
 
 
+def test_update_provider_config_without_touching_secret(client, auth_headers):
+    create = client.post(
+        "/api/providers",
+        headers=auth_headers,
+        json={
+            "kind": "llm",
+            "provider_code": "omnirouter",
+            "config": {"base_url": "http://localhost:20128/v1"},
+            "secret": "sk-original1234",
+        },
+    )
+    provider_id = create.json()["id"]
+
+    r = client.put(
+        f"/api/providers/{provider_id}",
+        headers=auth_headers,
+        json={"config": {"base_url": "http://localhost:9999/v1"}},
+    )
+    assert r.status_code == 200
+    data = r.json()
+    assert data["config"] == {"base_url": "http://localhost:9999/v1"}
+    assert data["secret_last4"] == "1234"  # secret lama tidak berubah
+
+
+def test_update_provider_rotates_secret(client, auth_headers):
+    create = client.post(
+        "/api/providers",
+        headers=auth_headers,
+        json={"kind": "stt", "provider_code": "groq", "secret": "old-secret-1111"},
+    )
+    provider_id = create.json()["id"]
+
+    r = client.put(
+        f"/api/providers/{provider_id}",
+        headers=auth_headers,
+        json={"secret": "new-secret-2222"},
+    )
+    assert r.status_code == 200
+    assert r.json()["secret_last4"] == "2222"
+
+
+def test_update_provider_not_found(client, auth_headers):
+    r = client.put(
+        "/api/providers/00000000-0000-0000-0000-000000000000",
+        headers=auth_headers,
+        json={"config": {"x": 1}},
+    )
+    assert r.status_code == 404
+
+
+def test_cannot_update_other_owner_provider(client, auth_headers, other_auth_headers):
+    create = client.post(
+        "/api/providers",
+        headers=auth_headers,
+        json={"kind": "llm", "provider_code": "omnirouter", "secret": "sk-mine1234"},
+    )
+    provider_id = create.json()["id"]
+
+    r = client.put(
+        f"/api/providers/{provider_id}",
+        headers=other_auth_headers,
+        json={"config": {"base_url": "http://evil"}},
+    )
+    assert r.status_code == 404
+
+
 def test_cannot_access_other_owner_provider(client, auth_headers, other_auth_headers):
     create = client.post(
         "/api/providers",

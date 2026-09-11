@@ -2,6 +2,7 @@ import { useState } from "react";
 import {
   useProviders,
   useCreateProvider,
+  useUpdateProvider,
   useDeleteProvider,
   useTestProvider,
   type ProviderCred,
@@ -46,10 +47,12 @@ const DEFAULT_FORM: FormState = {
 export default function Providers() {
   const { data: providers, isLoading, isError } = useProviders();
   const createProvider = useCreateProvider();
+  const updateProvider = useUpdateProvider();
   const deleteProvider = useDeleteProvider();
   const testProvider = useTestProvider();
 
   const [showForm, setShowForm] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState<FormState>(DEFAULT_FORM);
   const [configError, setConfigError] = useState<string | null>(null);
   const [testResults, setTestResults] = useState<Record<string, { ok: boolean; message: string }>>(
@@ -65,18 +68,33 @@ export default function Providers() {
   const otherKinds = Object.keys(grouped).filter((k) => !knownKindValues.has(k));
 
   function startCreate() {
+    setEditingId(null);
     setForm(DEFAULT_FORM);
+    setConfigError(null);
+    setShowForm(true);
+  }
+
+  function startEdit(p: ProviderCred) {
+    setEditingId(p.id);
+    setForm({
+      kind: p.kind,
+      provider_code: p.provider_code,
+      configText: JSON.stringify(p.config ?? {}, null, 2),
+      secret: "",
+      fallback_of: p.fallback_of ?? "",
+    });
     setConfigError(null);
     setShowForm(true);
   }
 
   function cancelCreate() {
     setShowForm(false);
+    setEditingId(null);
     setForm(DEFAULT_FORM);
     setConfigError(null);
   }
 
-  async function handleCreate() {
+  async function handleSave() {
     let config: Record<string, unknown> = {};
     try {
       config = form.configText.trim() ? JSON.parse(form.configText) : {};
@@ -86,15 +104,27 @@ export default function Providers() {
     }
     setConfigError(null);
 
-    const body: ProviderCreateInput = {
-      kind: form.kind,
-      provider_code: form.provider_code,
-      config,
-      secret: form.secret,
-      fallback_of: form.fallback_of || null,
-    };
-    await createProvider.mutateAsync(body);
+    if (editingId) {
+      await updateProvider.mutateAsync({
+        id: editingId,
+        body: {
+          config,
+          ...(form.secret ? { secret: form.secret } : {}),
+          fallback_of: form.fallback_of || null,
+        },
+      });
+    } else {
+      const body: ProviderCreateInput = {
+        kind: form.kind,
+        provider_code: form.provider_code,
+        config,
+        secret: form.secret,
+        fallback_of: form.fallback_of || null,
+      };
+      await createProvider.mutateAsync(body);
+    }
     setShowForm(false);
+    setEditingId(null);
     setForm(DEFAULT_FORM);
   }
 
@@ -133,14 +163,17 @@ export default function Providers() {
 
       {showForm && (
         <div className="rounded-xl border border-border bg-surface p-5">
-          <h2 className="mb-3 text-[13px] font-semibold text-text">Tambah Provider</h2>
+          <h2 className="mb-3 text-[13px] font-semibold text-text">
+            {editingId ? "Edit Provider" : "Tambah Provider"}
+          </h2>
           <div className="grid grid-cols-2 gap-3">
             <label className="flex flex-col gap-1">
               <span className="text-[11px] font-medium uppercase text-text-dim">Kind</span>
               <select
                 value={form.kind}
+                disabled={!!editingId}
                 onChange={(e) => setForm((f) => ({ ...f, kind: e.target.value, fallback_of: "" }))}
-                className="rounded-lg border border-border bg-bg px-3 py-2 text-[13px] text-text"
+                className="rounded-lg border border-border bg-bg px-3 py-2 text-[13px] text-text disabled:opacity-60"
               >
                 {KIND_OPTIONS.map((opt) => (
                   <option key={opt.value} value={opt.value}>
@@ -155,9 +188,10 @@ export default function Providers() {
               </span>
               <input
                 value={form.provider_code}
+                disabled={!!editingId}
                 onChange={(e) => setForm((f) => ({ ...f, provider_code: e.target.value }))}
                 placeholder="omnirouter, groq, piper, searxng..."
-                className="rounded-lg border border-border bg-bg px-3 py-2 text-[13px] text-text"
+                className="rounded-lg border border-border bg-bg px-3 py-2 text-[13px] text-text disabled:opacity-60"
               />
             </label>
             <label className="col-span-2 flex flex-col gap-1">
@@ -174,11 +208,12 @@ export default function Providers() {
             </label>
             <label className="flex flex-col gap-1">
               <span className="text-[11px] font-medium uppercase text-text-dim">
-                Secret / API Key
+                Secret / API Key {editingId && "(kosongkan buat pertahankan yang lama)"}
               </span>
               <input
                 type="password"
                 value={form.secret}
+                placeholder={editingId ? "••••••••" : ""}
                 onChange={(e) => setForm((f) => ({ ...f, secret: e.target.value }))}
                 className="rounded-lg border border-border bg-bg px-3 py-2 text-[13px] text-text"
               />
@@ -193,21 +228,28 @@ export default function Providers() {
                 className="rounded-lg border border-border bg-bg px-3 py-2 text-[13px] text-text"
               >
                 <option value="">— Tidak ada —</option>
-                {fallbackCandidates.map((p) => (
-                  <option key={p.id} value={p.id}>
-                    {p.provider_code} ({p.secret_last4})
-                  </option>
-                ))}
+                {fallbackCandidates
+                  .filter((p) => p.id !== editingId)
+                  .map((p) => (
+                    <option key={p.id} value={p.id}>
+                      {p.provider_code} ({p.secret_last4})
+                    </option>
+                  ))}
               </select>
             </label>
           </div>
           <div className="mt-4 flex items-center gap-3">
             <button
-              onClick={handleCreate}
-              disabled={createProvider.isPending || !form.provider_code || !form.secret}
+              onClick={handleSave}
+              disabled={
+                createProvider.isPending ||
+                updateProvider.isPending ||
+                !form.provider_code ||
+                (!editingId && !form.secret)
+              }
               className="rounded-lg bg-amber px-4 py-2 text-[12px] font-semibold text-bg hover:bg-amber-light disabled:opacity-50"
             >
-              Simpan Provider
+              {editingId ? "Simpan Perubahan" : "Simpan Provider"}
             </button>
             <button
               onClick={cancelCreate}
@@ -227,6 +269,7 @@ export default function Providers() {
             providers={grouped[k.value] ?? []}
             allProviders={providers ?? []}
             testResults={testResults}
+            onEdit={startEdit}
             onDelete={handleDelete}
             onTest={handleTest}
             testPending={testProvider.isPending}
@@ -239,6 +282,7 @@ export default function Providers() {
             providers={grouped[kind]}
             allProviders={providers ?? []}
             testResults={testResults}
+            onEdit={startEdit}
             onDelete={handleDelete}
             onTest={handleTest}
             testPending={testProvider.isPending}
@@ -257,6 +301,7 @@ function ProviderKindColumn({
   providers,
   allProviders,
   testResults,
+  onEdit,
   onDelete,
   onTest,
   testPending,
@@ -265,6 +310,7 @@ function ProviderKindColumn({
   providers: ProviderCred[];
   allProviders: ProviderCred[];
   testResults: Record<string, { ok: boolean; message: string }>;
+  onEdit: (p: ProviderCred) => void;
   onDelete: (id: string) => void;
   onTest: (id: string) => void;
   testPending: boolean;
@@ -309,6 +355,12 @@ function ProviderKindColumn({
                   className="rounded-lg border border-border px-2 py-1 text-[11px] font-semibold text-text-secondary hover:bg-surface-alt disabled:opacity-50"
                 >
                   Tes Koneksi
+                </button>
+                <button
+                  onClick={() => onEdit(p)}
+                  className="rounded-lg border border-border px-2 py-1 text-[11px] font-semibold text-text-secondary hover:bg-surface-alt"
+                >
+                  Edit
                 </button>
                 <button
                   onClick={() => onDelete(p.id)}

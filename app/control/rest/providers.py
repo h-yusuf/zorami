@@ -8,7 +8,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.control.auth import get_current_owner
-from app.control.schemas import ProviderCredCreate, ProviderCredOut
+from app.control.schemas import ProviderCredCreate, ProviderCredOut, ProviderCredUpdate
 from app.core.crypto import decrypt_secret, encrypt_secret, last4
 from app.core.db import get_session
 from app.core.models import ProviderCred
@@ -78,6 +78,31 @@ async def create_provider(
         fallback_of=fallback_uuid,
     )
     db.add(provider)
+    await db.commit()
+    await db.refresh(provider)
+    return _to_out(provider)
+
+
+@router.put("/{provider_id}", response_model=ProviderCredOut)
+async def update_provider(
+    provider_id: str,
+    body: ProviderCredUpdate,
+    owner_id: str = Depends(get_current_owner),
+    db: AsyncSession = Depends(get_session),
+):
+    provider = await _get_owned_provider(provider_id, owner_id, db)
+
+    if body.config is not None:
+        provider.config = body.config
+    if body.secret:
+        provider.secret_encrypted = encrypt_secret(body.secret)
+        provider.secret_last4 = last4(body.secret)
+    if body.fallback_of is not None:
+        try:
+            provider.fallback_of = uuid.UUID(body.fallback_of)
+        except ValueError:
+            raise HTTPException(status_code=422, detail="fallback_of tidak valid")
+
     await db.commit()
     await db.refresh(provider)
     return _to_out(provider)

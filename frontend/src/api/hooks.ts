@@ -175,6 +175,23 @@ export function useCreateProvider() {
   });
 }
 
+export type ProviderUpdateInput = {
+  config?: Record<string, unknown>;
+  secret?: string;
+  fallback_of?: string | null;
+};
+
+export function useUpdateProvider() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, body }: { id: string; body: ProviderUpdateInput }) =>
+      apiJson<ProviderCred>(`/api/providers/${id}`, { method: "PUT", body: JSON.stringify(body) }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["providers"] });
+    },
+  });
+}
+
 export function useDeleteProvider() {
   const queryClient = useQueryClient();
   return useMutation({

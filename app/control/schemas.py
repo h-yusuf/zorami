@@ -71,6 +71,12 @@ class ProviderCredCreate(BaseModel):
     fallback_of: Optional[str] = None
 
 
+class ProviderCredUpdate(BaseModel):
+    config: Optional[dict] = None
+    secret: Optional[str] = None  # kosongkan/omit buat pertahankan secret lama
+    fallback_of: Optional[str] = None
+
+
 class DeviceOut(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
