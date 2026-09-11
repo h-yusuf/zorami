@@ -338,6 +338,7 @@ export function useConversations(filters: ConversationFilters = {}) {
   return useQuery({
     queryKey: ["conversations", filters],
     queryFn: () => apiJson<ConversationSummary[]>(`/api/conversations${qs ? `?${qs}` : ""}`),
+    refetchInterval: 5000,
   });
 }
 
@@ -346,6 +347,7 @@ export function useConversationDetail(id: string | null) {
     queryKey: ["conversations", id],
     queryFn: () => apiJson<ConversationDetail>(`/api/conversations/${id}`),
     enabled: !!id,
+    refetchInterval: 3000,
   });
 }
 
